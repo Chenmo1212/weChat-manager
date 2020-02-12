@@ -126,27 +126,30 @@
             <el-row class="newsMsg">
               <el-col :span="20">
                 <div style="text-align: left;">2：图文消息
-                  <el-button plain size="mini" style="border:none" :disabled="checkedIndex === null" @click.native="checkedIndex = null">重新选择</el-button>
+                  <el-button plain size="mini" style="border:none" :disabled="checkedIndex === null"
+                             @click.native="checkedIndex = null">重新选择
+                  </el-button>
                 </div>
                 <div class="card-box" @click="dialogVisible = true" v-if="checkedIndex === null">
                   <i class="el-icon-plus add-news-icon"></i>
                 </div>
-                <el-card :body-style="{ padding: '0px' }" shadow="hover" v-else="checkedIndex !== null" style="width: 100%;">
+                <el-card :body-style="{ padding: '0px' }" shadow="hover" v-else="checkedIndex !== null"
+                         style="width: 100%;">
                   <el-row style="width: 100%;">
                     <el-col :span="8" style="width: 100px; padding: 14px;">
                       <el-image
                         style="width: 100%; height: 60px;display: block;"
-                        src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg"
+                        :src="newsLists[checkedIndex].content.news_item[0].thumb_url"
                         fit="cover"
                         class="image">
                       </el-image>
                     </el-col>
                     <el-col :span="17">
                       <el-row style="padding: 14px 14px 14px 0;text-align: left;">
-                        <el-row class="header text-ellipsis">好吃的汉堡好吃的汉堡好吃的汉堡好吃的汉堡</el-row>
+                        <el-row class="header text-ellipsis">{{newsLists[checkedIndex].content.news_item[0].title}}</el-row>
                         <el-row class="content" :gutter="3">
-                          <el-col :span="16" class="digest text-ellipsis">这是一个非常好吃的汉堡</el-col>
-                          <el-col :span="8" class="date">2020-12-12</el-col>
+                          <el-col :span="16" class="digest text-ellipsis">{{newsLists[checkedIndex].content.news_item[0].digest}}</el-col>
+                          <el-col :span="8" class="date">{{newsLists[checkedIndex].content.update_time}}</el-col>
                         </el-row>
                       </el-row>
                     </el-col>
@@ -188,23 +191,24 @@
             <el-divider></el-divider>
 
             <el-row class="newsCard-box" style="width: 100%;" v-loading="dialogLoading">
-              <el-col v-for="(item, index) in 10" :key="index" :span="22" :offset="1">
-                <el-card :body-style="{ padding: '0px' }" shadow="hover" :class="{'checked': index === checkedIndex }" @click.native="checkedIndex = index">
+              <el-col v-for="(item, index) in newsLists" :key="index" :span="22" :offset="1">
+                <el-card :body-style="{ padding: '0px' }" shadow="hover" :class="{'checked': index === checkedIndex }"
+                         @click.native="checkedIndex = index">
                   <el-row>
                     <el-col :span="8" style="width: 100px; padding: 14px;">
                       <el-image
                         style="width: 100%; height: 60px;display: block;"
-                        src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg"
+                        :src="item.content.news_item[0].thumb_url"
                         fit="cover"
                         class="image">
                       </el-image>
                     </el-col>
                     <el-col :span="16">
                       <el-row style="padding: 14px 14px 14px 0;text-align: left;">
-                        <el-row class="header text-ellipsis">好吃的汉堡好吃的汉堡好吃的汉堡好吃的汉堡</el-row>
+                        <el-row class="header text-ellipsis">{{item.content.news_item[0].title}}</el-row>
                         <el-row class="content" :gutter="5">
-                          <el-col :span="16" class="digest text-ellipsis">这是一个非常好吃的汉堡</el-col>
-                          <el-col :span="8" class="date">2020-12-12</el-col>
+                          <el-col :span="16" class="digest text-ellipsis">{{item.content.news_item[0].digest}}</el-col>
+                          <el-col :span="8" class="date">{{item.content.update_time}}</el-col>
                         </el-row>
                       </el-row>
                     </el-col>
@@ -214,12 +218,11 @@
             </el-row>
           </el-row>
           <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page.sync="currentPage3"
-            :page-size="100"
+            :page-size="4"
+            @current-change="handleNewsCurrentChange"
+            :current-page.sync="newsListPage"
             layout="prev, pager, next, jumper"
-            :total="1000">
+            :total="newsTotal">
           </el-pagination>
           <span slot="footer" class="dialog-footer">
             <el-button @click.native="cancelDialog">取 消</el-button>
@@ -576,12 +579,14 @@
 
         // 选择图文
         dialogVisible: false,
-        currentPage3: 3,
+        newsListPage: 1,
         checkedIndex: null,
         isSelectNews: false,
         dialogLoading: false,
+        newsTotal: null,
+        newsLists: [],
         // 选择类型
-        newsTypeArr: ["Win","Mac","Android","iOS","教程","技巧","网站","小程序"],
+        newsTypeArr: ["Win", "Mac", "Android", "iOS", "教程", "技巧", "网站", "小程序"],
 
         // 表单标签宽度
         formLabelWidth: '15%',
@@ -593,16 +598,24 @@
       }
     },
     methods: {
-      openDialog(){
+      openDialog() {
         console.log("默认打开");
-        console.log(item);
+        this.dialogLoading = true;
+        this.getArticleLists(0);
       },
-
-
-      cancelDialog(){
+      // 跳转页
+      handleNewsCurrentChange(val) {
+        this.newsListPage = val;
+        console.log(`素材当前页: ${val}`);
+        this.dialogLoading = true;
+        this.getArticleLists(val * 4)
+      },
+      // 关闭dialog
+      cancelDialog() {
         this.dialogVisible = false;
         this.checkedIndex = null;
       },
+
       handleOpen() {
         console.log("默认打开");
       },
@@ -769,6 +782,16 @@
         }
       },
 
+
+      // 时间戳函数
+      timestampToTime(timestamp) {
+        var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        var D = date.getDate() + ' ';
+        return Y + M + D;
+      },
+
       // 获取文章
       getArticle() {
         console.log("调用")
@@ -781,10 +804,6 @@
 
       // 获取token
       getToken() {
-        this.$message({
-          message: '警告哦，这个功能攻城狮还没做',
-          type: 'warning'
-        });
         console.log("获取token");
         getToken().then(res => {
           console.log(res.data.access_token)
@@ -799,8 +818,20 @@
         this.getToken();
 
         console.log("获取素材列表");
-        getArticleLists("news", begin, 20).then(res => {
-          console.log("素材列表：", res.data)
+        getArticleLists("news", begin, 4).then(res => {
+          this.newsLists = [];
+          console.log("数组：", this.newsLists);
+          console.log("素材列表：", res.data);
+          this.dialogLoading = false;
+          this.newsTotal = res.data.total_count;
+          this.newsLists = res.data.item;
+
+          // 时间戳转日期
+          for (var i = 0; i<4;i++){
+            this.newsLists[i].content.update_time = this.timestampToTime(this.newsLists[i].content.update_time);
+            this.newsLists[i].content.news_item[0].thumb_url = "http://img01.store.sogou.com/net/a/04/link?appid=100520029&url=" + this.newsLists[i].content.news_item[0].thumb_url;
+          }
+          console.log(this.newsLists)
         }).catch(err => {
           console.log(err);
         })
