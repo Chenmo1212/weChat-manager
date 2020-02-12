@@ -3,17 +3,17 @@
     <el-container>
 
       <el-aside id="el-aside" v-if="!phoneWidth">
-        <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+        <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleCloseKeywords"
                  :collapse="isCollapse">
           <el-menu-item index="1">
             <i class="el-icon-s-data"></i>
             <span slot="title">数据</span>
           </el-menu-item>
-          <el-menu-item index="2" @click="dialog = true">
+          <el-menu-item index="2" @click="isAddKeywords = true">
             <i class="el-icon-plus"></i>
             <span slot="title">添加</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="getToken">
+          <el-menu-item index="3" @click="uploadKeywords = true">
             <i class="el-icon-upload2"></i>
             <span slot="title">上传</span>
           </el-menu-item>
@@ -65,9 +65,11 @@
                 <i slot="suffix" class="el-input__icon el-icon-search" @click="searchData"></i>
               </el-input>
             </template>
-            <template slot-scope="scope" >
-              <el-button icon="el-icon-edit" :class="{'phoneStyle': phoneWidth}" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
-              <el-button icon="el-icon-delete" :class="{'phoneStyle': phoneWidth}" @click="handleDelete(scope.$index, scope.row)" circle></el-button>
+            <template slot-scope="scope">
+              <el-button icon="el-icon-edit" :class="{'phoneStyle': phoneWidth}"
+                         @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+              <el-button icon="el-icon-delete" :class="{'phoneStyle': phoneWidth}"
+                         @click="handleDelete(scope.$index, scope.row)" circle></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -86,11 +88,11 @@
 
     </el-container>
 
-    <!--抽屉-->
+    <!--新增抽屉-->
     <el-drawer
       title="添加新的关键词"
-      :before-close="handleClose"
-      :visible.sync="dialog"
+      :before-close="handleCloseKeywords"
+      :visible.sync="isAddKeywords"
       direction="ltr"
       ref="drawer"
       :size="drawerSize"
@@ -107,21 +109,129 @@
             </el-col>
           </el-form-item>
           <el-form-item label="内容" :label-width="formLabelWidth">
-            <el-col :span="20">
-              <el-input
-                type="textarea"
-                :autosize="{ minRows: 4}"
-                placeholder="请输入内容"
-                v-model="form.row.content">
-              </el-input>
-              <div style="text-align: left;">请不要多于1000字否则无法发送！</div>
-            </el-col>
+            <!--文本消息-->
+            <el-row class="textMsg">
+              <el-col :span="20">
+                <div style="text-align: left;">1：文本消息</div>
+                <el-input
+                  type="textarea"
+                  :autosize="{ minRows: 4}"
+                  placeholder="请输入内容"
+                  v-model="form.row.content">
+                </el-input>
+                <div style="text-align: left;">请不要多于1000字否则无法发送！</div>
+              </el-col>
+            </el-row>
+            <!--图文消息-->
+            <el-row class="newsMsg">
+              <el-col :span="20">
+                <div style="text-align: left;">2：图文消息</div>
+                <div class="card-box" @click="dialogVisible = true">
+                  <i class="el-icon-plus add-news-icon"></i>
+                </div>
+                <el-card :body-style="{ padding: '0px' }" shadow="hover" style="width: 100%;">
+                  <el-row style="width: 100%;">
+                    <el-col :span="8" style="width: 100px; padding: 14px;">
+                      <el-image
+                        style="width: 100%; height: 60px;display: block;"
+                        src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg"
+                        fit="cover"
+                        class="image">
+                      </el-image>
+                    </el-col>
+                    <el-col :span="17">
+                      <el-row style="padding: 14px 14px 14px 0;text-align: left;">
+                        <el-row class="header text-ellipsis">好吃的汉堡好吃的汉堡好吃的汉堡好吃的汉堡</el-row>
+                        <el-row class="content" :gutter="3">
+                          <el-col :span="16" class="digest text-ellipsis">这是一个非常好吃的汉堡</el-col>
+                          <el-col :span="8" class="date">2020-12-12</el-col>
+                        </el-row>
+                      </el-row>
+                    </el-col>
+                  </el-row>
+                </el-card>
+              </el-col>
+            </el-row>
+
+            <!--图文类型-->
+            <!--<el-row class="newsType" style="margin:10px 0">-->
+            <!--<el-row style="text-align: left;">-->
+            <!--<div style="text-align: left;">3：图文类型</div>-->
+            <!--<el-checkbox-group v-model="form.row.checkNewsTypeList">-->
+            <!--<el-col v-for="(item, index) in newsTypeArr" :span="6">-->
+            <!--<el-checkbox :label="item"></el-checkbox>-->
+            <!--</el-col>-->
+            <!--</el-checkbox-group>-->
+            <!--</el-row>-->
+            <!--</el-row>-->
           </el-form-item>
         </el-form>
+
+        <!--图文选择-->
+        <el-dialog
+          title="选择图文"
+          :modal="false"
+          :visible.sync="dialogVisible"
+          width="50%">
+          <el-row style="width: 100%;">
+            <el-input
+              placeholder="关键词搜索"
+              v-model="search"
+              @blur="searchBlur"
+              @keyup.enter.native="searchData()">
+              <i slot="suffix" class="el-input__icon el-icon-search" @click="searchData"></i>
+            </el-input>
+            <el-divider></el-divider>
+            <el-row class="newsCard-box" style="width: 100%;">
+              <el-col v-for="(item,index) in 10" :span="22" :offset="1">
+                <el-card :body-style="{ padding: '0px' }" shadow="hover" style="width: 100%;margin: 0 auto 10px;">
+                  <el-row>
+                    <el-col :span="8" style="width: 100px; padding: 14px;">
+                      <el-image
+                        style="width: 100%; height: 60px;display: block;"
+                        src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg"
+                        fit="cover"
+                        class="image">
+                      </el-image>
+                    </el-col>
+                    <el-col :span="16">
+                      <el-row style="padding: 14px 14px 14px 0;text-align: left;">
+                        <el-row class="header text-ellipsis">好吃的汉堡好吃的汉堡好吃的汉堡好吃的汉堡</el-row>
+                        <el-row class="content" :gutter="5">
+                          <el-col :span="16" class="digest text-ellipsis">这是一个非常好吃的汉堡</el-col>
+                          <el-col :span="8" class="date">2020-12-12</el-col>
+                        </el-row>
+                      </el-row>
+                    </el-col>
+                  </el-row>
+                </el-card>
+              </el-col>
+              </el-row>
+          </el-row>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+          </span>
+        </el-dialog>
+
+
         <div class="demo-drawer__footer">
           <el-button @click="cancelForm">取 消</el-button>
-          <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+          <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading ? '提交中 ...' : '确定'
+            }}
+          </el-button>
         </div>
+      </div>
+    </el-drawer>
+
+    <!--上传抽屉-->
+    <el-drawer
+      title="我是标题"
+      :visible.sync="uploadKeywords"
+      :size="drawerSize"
+      :with-header="false">
+      <div class="upload-drawer__content">
+        <el-row>1. 请先下载模板，按照模板填写问题和答案</el-row>
       </div>
     </el-drawer>
 
@@ -131,19 +241,18 @@
         <span aria-hidden="true"></span>
       </a>
       <ul class="cd-stretchy-nav-ul">
-        <li><span @click="dialog = true"><i class="el-icon-plus"></i></span></li>
+        <li><span @click="isAddKeywords = true"><i class="el-icon-plus"></i></span></li>
         <li><span @click="getToken"><i class="el-icon-upload2"></i></span></li>
         <li><span @click="getArticleLists"><i class="el-icon-download"></i></span></li>
       </ul>
       <span aria-hidden="true" class="stretchy-nav-bg"></span>
     </nav>
 
-
   </div>
 </template>
 
 <script>
-  import {getArticleCount, getToken, getArticleLists} from '../axios/api';
+  import {getArticleCount, getToken, getArticleLists, getKeywordLists, delKeywords, addKeywords} from '../axios/api';
 
   export default {
     keywords: "management",
@@ -428,29 +537,44 @@
         maxTableHeight: 600,
         tableLoading: false,
 
-        // 抽屉
+        // 添加关键词抽屉
         drawer: false,
-        dialog: false,
+        isAddKeywords: false,
         loading: false,
         drawerSize: "40%",
         // 表单内容
         form: {
-          index: '',
-          row: {
-            keywords: '',
-            content: '',
-            date: null
+          index: '',  // 关键词的下标
+          row: {      // 内容
+            keywords: '', // 关键词，Str
+            content: '',  // 根据关键词回复的内容，Str
+            num: 100,     // 用户触发的次数， Int
+            date: "2020-12-12",   // 新增关键词的时间（我转成日期字符串），Str
+            news: {       // 图文内容， Obj（dict）
+              title: "",      // 图文的标题，Str
+              digest: "",     // 图文的摘要，Str
+              update_time: "",    // 图文的更新时间， timestamp 10位时间戳格式
+              cover: "",      // 图文封面图的链接，Str
+              url: "",        // 图文的链接，Str
+              type: ["win",], // 图文的类型，Arr（list）
+            }
           },
         },
+        dialogVisible: true,
+        // newsTypeArr: ["Win","Mac","Android","iOS","教程","技巧","网站","小程序"],
+        // checkNewsTypeList: [],
         // 表单标签宽度
         formLabelWidth: '15%',
+
+        // 上传关键词抽屉
+        uploadKeywords: false,
 
         phoneWidth: false,
       }
     },
     methods: {
-      handleOpen(){
-        console.log("默认打开")
+      handleOpen() {
+        console.log("默认打开");
       },
       // 编辑关键词
       handleEdit(index, row) {
@@ -459,16 +583,26 @@
         this.form.content = row.content;
         this.form.index = row.index;
         this.form.row = row;
-        this.dialog = true;
+        this.isAddKeywords = true;
       },
       // 删除关键词
-      handleDelete(index, row){
+      handleDelete(index, row) {
         console.log(index, row);
+        const that = this;
         this.$confirm('确定删除该关键词吗？删除后不可恢复！')
           .then(_ => {
             console.log("点了确定");
-            this.loading = true;
-            this.screenTableData.splice(index, 1);
+            // this.loading = true;
+            console.log(row._id.$oid);
+
+            delKeywords(row._id.$oid).then(res=>{
+              console.log(res)
+              that.getKeywordLists()
+            }).catch(err=>{
+              console.log(err)
+            })
+
+
             // 动画关闭需要一定的时间
             setTimeout(() => {
               this.loading = false;
@@ -496,9 +630,9 @@
       // 搜索关键词
       searchData() {
         console.log("搜索");
-        if(this.search === ''){
+        if (this.search === '') {
           this.$message('搜索内容不得为空');
-          return ;
+          return;
         }
 
         let keywords = this.search;
@@ -512,8 +646,8 @@
         // 动画关闭需要一定的时间
         setTimeout(() => {
           // 遍历数组
-          for(var j = 0,len = arr.length; j < len; j++) {
-            if(arr[j].keywords.toLowerCase().indexOf(keywords.toLowerCase()) >=0 || arr[j].content.toLowerCase().indexOf(keywords.toLowerCase()) >=0){
+          for (var j = 0, len = arr.length; j < len; j++) {
+            if (arr[j].keywords.toLowerCase().indexOf(keywords.toLowerCase()) >= 0 || arr[j].content.toLowerCase().indexOf(keywords.toLowerCase()) >= 0) {
               this.screenTableData.push(arr[j]);
             }
           }
@@ -524,12 +658,12 @@
 
       },
       // 搜索框失去焦点
-      searchBlur(){
+      searchBlur() {
         console.log("搜索框失去焦点");
-        if(this.search === "") this.screenTableData = this.totalTableData;
+        if (this.search === "") this.screenTableData = this.totalTableData;
       },
       // 手动关闭抽屉
-      handleClose(done) {
+      handleCloseKeywords(done) {
         if (this.loading) {
           return;
         }
@@ -540,25 +674,51 @@
             that.loading = true;
             that.form.row.date = new Date().Format("yyyy-MM-dd");
             that.screenTableData[that.form.index] = that.form.row;
-            console.log(that.screenTableData[that.form.index])
+            console.log(that.screenTableData[that.form.index]);
+            console.log(that.form);
 
-            that.timer = setTimeout(() => {
-              done();
-              // 动画关闭需要一定的时间
-              setTimeout(() => {
-                this.loading = false;
-              }, 400);
-            }, 2000);
+            var item = that.form.row;
+            console.log(item);
+            addKeywords(item).then(res=>{
+              console.log(res);
+              that.timer = setTimeout(() => {
+                done();
+                // 动画关闭需要一定的时间
+                setTimeout(() => {
+                  this.loading = false;
+                }, 400);
+              }, 2000);
+
+
+            }).catch(err=>{
+              console.log(err);
+              that.timer = setTimeout(() => {
+                done();
+                // 动画关闭需要一定的时间
+                setTimeout(() => {
+                  this.loading = false;
+                }, 400);
+              }, 2000);
+            })
+
+            that.getKeywordLists()
+
           })
           .catch(_ => {
             console.log("点了取消");
             this.loading = false;
-            this.dialog = false;
+            this.isAddKeywords = false;
+            this.form.row.keywords = "";
+            this.form.row.content = "";
+            this.form.row.date = null;
           });
       },
       cancelForm() {
         this.loading = false;
-        this.dialog = false;
+        this.isAddKeywords = false;
+        this.form.row.keywords = "";
+        this.form.row.content = "";
+        this.form.row.date = null;
         clearTimeout(this.timer);
       },
 
@@ -605,13 +765,15 @@
         getToken().then(res => {
           console.log(res.data.access_token)
           localStorage.setItem("token", res.data.access_token)
-          // console.log(localStorage.getItem("token"))
+          console.log(localStorage.getItem("token"))
         }).catch(err => {
           console.log(err)
         })
       },
       // 获取素材列表
       getArticleLists() {
+        this.getToken();
+
         this.$message({
           message: '警告哦，这个功能攻城狮还没做',
           type: 'warning'
@@ -624,8 +786,20 @@
         })
       },
 
+      getKeywordLists(){
+        console.log("获取关键词列表");
+        const that = this;
+        getKeywordLists().then(res => {
+          console.log(JSON.parse(res.data.arr));
+          that.screenTableData = JSON.parse(res.data.arr)
+        }).catch(err => {
+          console.log(err)
+        })
+      }
     },
     created() {
+      // this.getKeywordLists();
+
       // 屏幕宽度小于1200
       let screenWidth = document.body.offsetWidth;
       // console.log(screenWidth);
@@ -644,22 +818,21 @@
       }
 
       // 时间戳函数
-      Date.prototype.Format = function(fmt)
-      { //author: meizz
+      Date.prototype.Format = function (fmt) { //author: meizz
         var o = {
-          "M+" : this.getMonth()+1,                 //月份
-          "d+" : this.getDate(),                    //日
-          "h+" : this.getHours(),                   //小时
-          "m+" : this.getMinutes(),                 //分
-          "s+" : this.getSeconds(),                 //秒
-          "q+" : Math.floor((this.getMonth()+3)/3), //季度
-          "S"  : this.getMilliseconds()             //毫秒
+          "M+": this.getMonth() + 1,                 //月份
+          "d+": this.getDate(),                    //日
+          "h+": this.getHours(),                   //小时
+          "m+": this.getMinutes(),                 //分
+          "s+": this.getSeconds(),                 //秒
+          "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+          "S": this.getMilliseconds()             //毫秒
         };
-        if(/(y+)/.test(fmt))
-          fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
-        for(var k in o)
-          if(new RegExp("("+ k +")").test(fmt))
-            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+        if (/(y+)/.test(fmt))
+          fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+          if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
         return fmt;
       }
     },
@@ -704,9 +877,10 @@
 
 <style lang="scss" scoped>
   .el-main {
-    .phoneStyle{
+    .phoneStyle {
       padding: 4px !important;
     }
+
     .block {
       position: relative;
 
@@ -721,6 +895,13 @@
       }
     }
   }
+
+  .text-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   ul, li {
     list-style: none;
   }
@@ -775,15 +956,15 @@
   }
 
   .cd-nav-trigger span {
-     left: 50%;
-     top: 50%;
-     bottom: auto;
-     right: auto;
-     -webkit-transform: translateX(-50%) translateY(-50%);
-     transform: translateX(-50%) translateY(-50%);
-     -webkit-transition: background-color 0.2s;
-     transition: background-color 0.2s;
-   }
+    left: 50%;
+    top: 50%;
+    bottom: auto;
+    right: auto;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-transition: background-color 0.2s;
+    transition: background-color 0.2s;
+  }
 
   .cd-nav-trigger span::after, .cd-nav-trigger span::before {
     content: '';
@@ -888,4 +1069,69 @@
     height: 50px;
     width: 50px;
   }
+
+
+  /*添加关键词抽屉*/
+  .newsMsg {
+    margin-top: 10px;
+
+    .card-box {
+      background-color: #fff;
+      width: 100%;
+      height: 90px;
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .card-box:hover {
+      border-color: #4d4d4d;
+    }
+
+    .add-news-icon {
+      text-align: center;
+      line-height: 90px;
+      font-size: 17px;
+      color: #8c939d;
+    }
+
+    .el-card {
+      .header {
+        color: #606266;
+      }
+
+      .content {
+        font-size: 12px;
+        color: #8c939d;
+      }
+    }
+  }
+
+
+  .upload-drawer__content {
+
+  }
+
+  .el-dialog {
+    .newsCard-box {
+      height: 400px;
+      overflow: auto;
+    }
+    
+    .el-card {
+      .header {
+        color: #606266;
+        line-height: 24px;
+        font-size: 16px;
+      }
+
+      .content {
+        font-size: 14px;
+        line-height: 24px;
+        margin-top: 10px;
+        color: #8c939d;
+      }
+    }
+  }
+
 </style>
