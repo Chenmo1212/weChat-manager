@@ -125,11 +125,13 @@
             <!--图文消息-->
             <el-row class="newsMsg">
               <el-col :span="20">
-                <div style="text-align: left;">2：图文消息</div>
-                <div class="card-box" @click="dialogVisible = true">
+                <div style="text-align: left;">2：图文消息
+                  <el-button plain size="mini" style="border:none" :disabled="checkedIndex === null" @click.native="checkedIndex = null">重新选择</el-button>
+                </div>
+                <div class="card-box" @click="dialogVisible = true" v-if="checkedIndex === null">
                   <i class="el-icon-plus add-news-icon"></i>
                 </div>
-                <el-card :body-style="{ padding: '0px' }" shadow="hover" style="width: 100%;">
+                <el-card :body-style="{ padding: '0px' }" shadow="hover" v-else="checkedIndex !== null" style="width: 100%;">
                   <el-row style="width: 100%;">
                     <el-col :span="8" style="width: 100px; padding: 14px;">
                       <el-image
@@ -154,16 +156,16 @@
             </el-row>
 
             <!--图文类型-->
-            <!--<el-row class="newsType" style="margin:10px 0">-->
-            <!--<el-row style="text-align: left;">-->
-            <!--<div style="text-align: left;">3：图文类型</div>-->
-            <!--<el-checkbox-group v-model="form.row.checkNewsTypeList">-->
-            <!--<el-col v-for="(item, index) in newsTypeArr" :span="6">-->
-            <!--<el-checkbox :label="item"></el-checkbox>-->
-            <!--</el-col>-->
-            <!--</el-checkbox-group>-->
-            <!--</el-row>-->
-            <!--</el-row>-->
+            <el-row class="newsType" style="margin:10px 0">
+              <el-row style="text-align: left;">
+                <div style="text-align: left;">3：图文类型</div>
+                <el-checkbox-group v-model="form.row.news.type">
+                  <el-col v-for="(item, index) in newsTypeArr" :key="index" :span="6">
+                    <el-checkbox :label="item"></el-checkbox>
+                  </el-col>
+                </el-checkbox-group>
+              </el-row>
+            </el-row>
           </el-form-item>
         </el-form>
 
@@ -172,6 +174,7 @@
           title="选择图文"
           :modal="false"
           :visible.sync="dialogVisible"
+          @open="openDialog"
           width="50%">
           <el-row style="width: 100%;">
             <el-input
@@ -181,10 +184,12 @@
               @keyup.enter.native="searchData()">
               <i slot="suffix" class="el-input__icon el-icon-search" @click="searchData"></i>
             </el-input>
+
             <el-divider></el-divider>
-            <el-row class="newsCard-box" style="width: 100%;">
-              <el-col v-for="(item,index) in 10" :span="22" :offset="1">
-                <el-card :body-style="{ padding: '0px' }" shadow="hover" style="width: 100%;margin: 0 auto 10px;">
+
+            <el-row class="newsCard-box" style="width: 100%;" v-loading="dialogLoading">
+              <el-col v-for="(item, index) in 10" :key="index" :span="22" :offset="1">
+                <el-card :body-style="{ padding: '0px' }" shadow="hover" :class="{'checked': index === checkedIndex }" @click.native="checkedIndex = index">
                   <el-row>
                     <el-col :span="8" style="width: 100px; padding: 14px;">
                       <el-image
@@ -206,10 +211,18 @@
                   </el-row>
                 </el-card>
               </el-col>
-              </el-row>
+            </el-row>
           </el-row>
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page.sync="currentPage3"
+            :page-size="100"
+            layout="prev, pager, next, jumper"
+            :total="1000">
+          </el-pagination>
           <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button @click.native="cancelDialog">取 消</el-button>
             <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
           </span>
         </el-dialog>
@@ -560,9 +573,16 @@
             }
           },
         },
-        dialogVisible: true,
-        // newsTypeArr: ["Win","Mac","Android","iOS","教程","技巧","网站","小程序"],
-        // checkNewsTypeList: [],
+
+        // 选择图文
+        dialogVisible: false,
+        currentPage3: 3,
+        checkedIndex: null,
+        isSelectNews: false,
+        dialogLoading: false,
+        // 选择类型
+        newsTypeArr: ["Win","Mac","Android","iOS","教程","技巧","网站","小程序"],
+
         // 表单标签宽度
         formLabelWidth: '15%',
 
@@ -573,6 +593,16 @@
       }
     },
     methods: {
+      openDialog(){
+        console.log("默认打开");
+        console.log(item);
+      },
+
+
+      cancelDialog(){
+        this.dialogVisible = false;
+        this.checkedIndex = null;
+      },
       handleOpen() {
         console.log("默认打开");
       },
@@ -585,6 +615,7 @@
         this.form.row = row;
         this.isAddKeywords = true;
       },
+
       // 删除关键词
       handleDelete(index, row) {
         console.log(index, row);
@@ -595,10 +626,10 @@
             // this.loading = true;
             console.log(row._id.$oid);
 
-            delKeywords(row._id.$oid).then(res=>{
+            delKeywords(row._id.$oid).then(res => {
               console.log(res)
               that.getKeywordLists()
-            }).catch(err=>{
+            }).catch(err => {
               console.log(err)
             })
 
@@ -679,7 +710,7 @@
 
             var item = that.form.row;
             console.log(item);
-            addKeywords(item).then(res=>{
+            addKeywords(item).then(res => {
               console.log(res);
               that.timer = setTimeout(() => {
                 done();
@@ -690,7 +721,7 @@
               }, 2000);
 
 
-            }).catch(err=>{
+            }).catch(err => {
               console.log(err);
               that.timer = setTimeout(() => {
                 done();
@@ -699,7 +730,7 @@
                   this.loading = false;
                 }, 400);
               }, 2000);
-            })
+            });
 
             that.getKeywordLists()
 
@@ -722,15 +753,7 @@
         clearTimeout(this.timer);
       },
 
-      // 成功通知
-      // openNotify(msg) {
-      //   this.$notify({
-      //     title: '成功',
-      //     message: msg,
-      //     type: 'success'
-      //   });
-      // },
-
+      // 手机模式触发菜单
       trigger() {
         var stretchyNavs = document.getElementsByClassName("cd-stretchy-nav")[0];
         var time;
@@ -755,6 +778,7 @@
           console.log(err)
         })
       },
+
       // 获取token
       getToken() {
         this.$message({
@@ -765,28 +789,25 @@
         getToken().then(res => {
           console.log(res.data.access_token)
           localStorage.setItem("token", res.data.access_token)
-          console.log(localStorage.getItem("token"))
+          // console.log(localStorage.getItem("token"))
         }).catch(err => {
           console.log(err)
         })
       },
       // 获取素材列表
-      getArticleLists() {
+      getArticleLists(begin) {
         this.getToken();
 
-        this.$message({
-          message: '警告哦，这个功能攻城狮还没做',
-          type: 'warning'
-        });
-        console.log("获取列表");
-        getArticleLists("news", 0, 20).then(res => {
-          console.log(res.data)
+        console.log("获取素材列表");
+        getArticleLists("news", begin, 20).then(res => {
+          console.log("素材列表：", res.data)
         }).catch(err => {
-          console.log(err)
+          console.log(err);
         })
       },
 
-      getKeywordLists(){
+      // 获取关键词列表
+      getKeywordLists() {
         console.log("获取关键词列表");
         const that = this;
         getKeywordLists().then(res => {
@@ -1117,8 +1138,16 @@
       height: 400px;
       overflow: auto;
     }
-    
+
+    .checked {
+      border: 1px solid #4d4d4d;
+    }
+
     .el-card {
+      width: 100%;
+      margin: 0 auto 10px;
+      padding: 0;
+
       .header {
         color: #606266;
         line-height: 24px;

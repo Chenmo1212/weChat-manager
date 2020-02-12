@@ -1,16 +1,16 @@
 import axios from 'axios'
 
-// export const api = axios.create({
-//   baseURL: 'https://api.weixin.qq.com/cgi-bin',
-//   headers: {
-//     'Content-Type': 'application/x-www-form-urlencoded',
-//     'Accept': 'application/vnd.toast.v1+json'
-//   },
-//   timeout: 10 * 1000
-// })
+export const api1 = axios.create({
+  baseURL: 'https://api.weixin.qq.com/cgi-bin',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Accept': 'application/vnd.toast.v1+json'
+  },
+  timeout: 10 * 1000
+})
 
 
-export const api = axios.create({
+export const api2 = axios.create({
   baseURL: 'https://api.powerrain.cn/',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
