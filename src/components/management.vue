@@ -35,7 +35,7 @@
           <el-table-column
             label="日期"
             sortable
-            :width="cellWidth"
+            :width="dateCellWidth"
             prop="date">
           </el-table-column>
           <el-table-column
@@ -190,7 +190,7 @@
       :modal="false"
       :visible.sync="dialogVisible"
       @open="openDialog"
-      width="50%">
+      :width="dialogWidth">
       <el-row style="width: 100%;">
 
         <el-divider></el-divider>
@@ -546,6 +546,7 @@
 
         // 表格宽高
         cellWidth: null,
+        dateCellWidth: 90,
         maxTableHeight: 600,
         tableLoading: false,
 
@@ -579,6 +580,7 @@
         checkedIndex: null,
         isSelectNews: false,
         dialogLoading: false,
+        dialogWidth: "50%",
         newsTotal: null,
         newsLists: [],
         // 选择类型
@@ -739,9 +741,10 @@
                 // 动画关闭需要一定的时间
                 setTimeout(() => {
                   this.loading = false;
+                  that.clearForm();
+                  that.getKeywordLists()
                 }, 400);
               }, 2000);
-
 
             }).catch(err => {
               console.log(err);
@@ -750,12 +753,10 @@
                 // 动画关闭需要一定的时间
                 setTimeout(() => {
                   this.loading = false;
+                  that.clearForm();
                 }, 400);
               }, 2000);
             });
-
-            that.clearForm()
-            that.getKeywordLists()
 
           })
           .catch(_ => {
@@ -784,6 +785,7 @@
         this.form.row.news.cover = "";
         this.form.row.news.url = "";
         this.form.row.news.type = [];
+        this.checkedIndex = null;
       },
 
       // 手机模式触发菜单
@@ -855,6 +857,7 @@
           console.log(this.newsLists)
         }).catch(err => {
           console.log(err);
+          this.$message('出错了，请刷新重试~');
         })
       },
 
@@ -871,7 +874,7 @@
       }
     },
     created() {
-      // this.getKeywordLists();
+      this.getKeywordLists();
 
       // 屏幕宽度小于1200
       let screenWidth = document.body.offsetWidth;
@@ -879,6 +882,7 @@
       if (screenWidth < 1200) {
         this.isCollapse = true;
         this.cellWidth = 68;
+        this.dateCellWidth = 90;
         this.maxTableHeight = 740;
         this.pageSize = 13;
       }
@@ -913,7 +917,7 @@
       // 根据屏幕做自适应
       // console.log(document.body.clientWidth)
       let screenWidth = document.body.clientWidth;
-      console.log(screenWidth)
+      console.log("当前屏幕宽度：", screenWidth);
       let left = document.getElementById("el-aside");
       if (screenWidth === 1920) {
         left.style.marginLeft = 200 + "px";
@@ -929,6 +933,7 @@
         left.style.marginLeft = 0;
         left.style.width = 100 + "px";
         this.drawerSize = "100%";
+        this.dialogWidth = "80%";
         // console.log(left.style.marginLeft)
         // console.log(left.style.width)
       }
@@ -937,6 +942,7 @@
         // left.style.width = 100 + "px";
         this.phoneWidth = true;
         this.drawerSize = "100%";
+        this.dialogWidth = "80%";
         // console.log(left.style.marginLeft)
         // console.log(left.style.width)
       }
