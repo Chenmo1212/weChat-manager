@@ -146,9 +146,12 @@
                     </el-col>
                     <el-col :span="17">
                       <el-row style="padding: 14px 14px 14px 0;text-align: left;">
-                        <el-row class="header text-ellipsis">{{newsLists[checkedIndex].content.news_item[0].title}}</el-row>
+                        <el-row class="header text-ellipsis">{{newsLists[checkedIndex].content.news_item[0].title}}
+                        </el-row>
                         <el-row class="content" :gutter="3">
-                          <el-col :span="16" class="digest text-ellipsis">{{newsLists[checkedIndex].content.news_item[0].digest}}</el-col>
+                          <el-col :span="16" class="digest text-ellipsis">
+                            {{newsLists[checkedIndex].content.news_item[0].digest}}
+                          </el-col>
                           <el-col :span="8" class="date">{{newsLists[checkedIndex].content.update_time}}</el-col>
                         </el-row>
                       </el-row>
@@ -174,8 +177,7 @@
 
         <div class="demo-drawer__footer">
           <el-button @click="cancelForm">取 消</el-button>
-          <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading ? '提交中 ...' : '确定'
-            }}
+          <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading ? '提交中 ...' : '确定' }}
           </el-button>
         </div>
       </div>
@@ -190,13 +192,6 @@
       @open="openDialog"
       width="50%">
       <el-row style="width: 100%;">
-        <el-input
-          placeholder="关键词搜索"
-          v-model="search"
-          @blur="searchBlur"
-          @keyup.enter.native="searchData()">
-          <i slot="suffix" class="el-input__icon el-icon-search" @click="searchData"></i>
-        </el-input>
 
         <el-divider></el-divider>
 
@@ -236,7 +231,7 @@
       </el-pagination>
       <span slot="footer" class="dialog-footer">
             <el-button @click.native="cancelDialog">取 消</el-button>
-            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            <el-button type="primary" @click="submitDialog">确 定</el-button>
           </span>
     </el-dialog>
 
@@ -565,15 +560,15 @@
           row: {      // 内容
             keywords: '', // 关键词，Str
             content: '',  // 根据关键词回复的内容，Str
-            num: 100,     // 用户触发的次数， Int
-            date: "2020-12-12",   // 新增关键词的时间（我转成日期字符串），Str
+            num: 0,     // 用户触发的次数， Int
+            date: null,   // 新增关键词的时间（我转成日期字符串），Str
             news: {       // 图文内容， Obj（dict）
               title: "",      // 图文的标题，Str
               digest: "",     // 图文的摘要，Str
               update_time: "",    // 图文的更新时间， timestamp 10位时间戳格式
               cover: "",      // 图文封面图的链接，Str
               url: "",        // 图文的链接，Str
-              type: ["win",], // 图文的类型，Arr（list）
+              type: [], // 图文的类型，Arr（list）
             }
           },
         },
@@ -616,7 +611,19 @@
         this.dialogVisible = false;
         this.checkedIndex = null;
       },
-
+      // 确定dialog
+      submitDialog(){
+        console.log(this.newsLists[this.checkedIndex]);
+        var item = this.newsLists[this.checkedIndex];
+        console.log(item.content.news_item[0]);
+        this.form.row.news.title = item.content.news_item[0].title;
+        this.form.row.news.cover = "http://img01.store.sogou.com/net/a/04/link?appid=100520029&url=" + item.content.news_item[0].thumb_url;
+        this.form.row.news.url = item.content.news_item[0].url;
+        this.form.row.news.digest = item.content.news_item[0].digest;
+        this.form.row.news.update_time = item.content.update_time;
+        this.dialogVisible = false;
+        console.log(this.form.row.news.update_time)
+      },
       handleOpen() {
         console.log("默认打开");
       },
@@ -707,7 +714,7 @@
         console.log("搜索框失去焦点");
         if (this.search === "") this.screenTableData = this.totalTableData;
       },
-      // 手动关闭抽屉
+      // 手动关闭抽屉(提交关键词)
       handleCloseKeywords(done) {
         if (this.loading) {
           return;
@@ -717,9 +724,10 @@
           .then(_ => {
             console.log("点了确定");
             that.loading = true;
+
+            // 时间戳转换日期
             that.form.row.date = new Date().Format("yyyy-MM-dd");
             that.screenTableData[that.form.index] = that.form.row;
-            console.log(that.screenTableData[that.form.index]);
             console.log(that.form);
 
             var item = that.form.row;
@@ -746,6 +754,7 @@
               }, 2000);
             });
 
+            that.clearForm()
             that.getKeywordLists()
 
           })
@@ -753,18 +762,28 @@
             console.log("点了取消");
             this.loading = false;
             this.isAddKeywords = false;
-            this.form.row.keywords = "";
-            this.form.row.content = "";
-            this.form.row.date = null;
+            this.clearForm()
           });
       },
       cancelForm() {
         this.loading = false;
         this.isAddKeywords = false;
+        this.clearForm()
+        clearTimeout(this.timer);
+      },
+      clearForm(){  // 清空form
+        console.log("清空form")
+        this.form.index = "";
         this.form.row.keywords = "";
         this.form.row.content = "";
+        this.form.row.num = "";
         this.form.row.date = null;
-        clearTimeout(this.timer);
+        this.form.row.news.title = "";
+        this.form.row.news.digest = "";
+        this.form.row.news.update_time = "";
+        this.form.row.news.cover = "";
+        this.form.row.news.url = "";
+        this.form.row.news.type = [];
       },
 
       // 手机模式触发菜单
@@ -819,6 +838,7 @@
         this.getToken();
 
         console.log("获取素材列表");
+        console.log("begin：", begin);
         getArticleLists("news", begin, 4).then(res => {
           this.newsLists = [];
           console.log("数组：", this.newsLists);
@@ -828,8 +848,8 @@
           this.newsLists = res.data.item;
 
           // 时间戳转日期
-          for (var i = 0; i<4;i++){
-            this.newsLists[i].content.update_time = this.timestampToTime(this.newsLists[i].content.update_time);
+          for (var i = 0; i < 4; i++) {
+            this.newsLists[i].content.update_date = this.timestampToTime(this.newsLists[i].content.update_time);
             this.newsLists[i].content.news_item[0].thumb_url = "http://img01.store.sogou.com/net/a/04/link?appid=100520029&url=" + this.newsLists[i].content.news_item[0].thumb_url;
           }
           console.log(this.newsLists)
@@ -952,6 +972,7 @@
   .hidden {
     overflow: hidden;
   }
+
   .text-ellipsis {
     overflow: hidden;
     white-space: nowrap;
@@ -1131,6 +1152,12 @@
   /deep/ .el-drawer.ltr {
     overflow-y: auto;
   }
+
+  /deep/ .el-drawer.ltr::-webkit-scrollbar
+  {
+    display: none
+  }
+
   .el-drawer {
     .newsMsg {
       margin-top: 10px;
@@ -1166,8 +1193,9 @@
         }
       }
     }
+
     .demo-drawer__footer {
-      margin: 20px 0 ;
+      margin: 20px 0;
     }
   }
 
