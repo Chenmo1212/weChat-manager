@@ -87,7 +87,8 @@
         spanIndex: 7,
         screenWidth: null,
         loginStatus: "登录",
-        isShowHeader: true
+        isShowHeader: true,
+        hasLogin: false
       }
     },
     created() {
@@ -102,17 +103,27 @@
       checkMenu(index) {
         this.checkedIndex = index;
         console.log(this.checkedIndex);
-        if (index === 1) this.$router.push({name: "management"});
+        if (index === 1) {
+          this.$router.push({
+            name: "management",
+            params: {
+              hasLogin: true
+            }
+          });
+        }
         if (index === 0) this.$router.push({name: "login"})
       },
-      getRouterName (name) {
-        console.log(name);
-        if (name === "management") {
+      getRouterName(obj) {
+        console.log(obj);
+        if (obj.routeName === "management") {
           this.checkedIndex = 1
         }
+        this.hasLogin = obj.hasLogin;
+        this.checkedIndex = obj.checkedIndex;
+        console.log("是否登录", this.hasLogin)
       },
     },
-    mounted () {
+    mounted() {
       // const that = this;
       // window.onresize = () => {
       //   return (() => {
@@ -122,9 +133,16 @@
       // }
 
       let screenWidth = document.body.offsetWidth;
-      console.log(screenWidth)
+      console.log(screenWidth);
       if (screenWidth <= 415) { // phone
         this.isShowHeader = false
+      }
+
+      console.log("是否登录", this.hasLogin);
+      if (this.hasLogin) {
+        this.$router.push({name: "management"});
+      } else {
+        this.$router.push({name: "login"});
       }
     },
 

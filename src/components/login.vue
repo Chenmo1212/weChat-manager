@@ -36,7 +36,9 @@
                   <el-checkbox v-model="remember">记住密码</el-checkbox>
                 </div>
                 <div class="loginBtn">
-                  <el-button type="info" size="large" @click="toManagement" :loading="loading">{{ loading ? '登录中 ...' : '登 录' }}</el-button>
+                  <el-button type="info" size="large" @click="toManagement" :loading="loading">{{ loading ? '登录中 ...' :
+                    '登 录' }}
+                  </el-button>
                 </div>
               </div>
             </el-col>
@@ -98,12 +100,17 @@
       }
     },
     methods: {
-      toManagement(){
+      toManagement() {
         this.loading = true;
         setTimeout(() => {
           this.loading = false;
-          this.$router.push({name: "management"});
-          this.$emit('getRouterName', "management");
+          this.$router.push({
+            name: "management",
+            params: {
+              hasLogin: true
+            }
+          });
+          this.$emit('getRouterName', {routeName: 'management', hasLogin: true});
           this.$message({
             message: '登录成功~',
             type: 'success'
@@ -113,7 +120,9 @@
       }
     },
     created() {
-
+      if (this.$route.params.hasLogin){
+        this.$emit('getRouterName', {routeName: 'login', hasLogin: false, checkedIndex: 0});
+      }
     },
     mounted() {
       let screenWidth = document.body.offsetWidth;
@@ -246,6 +255,7 @@
 
         .loginBtn {
           margin-top: 50px;
+
           .el-button {
             width: 80%;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
@@ -255,7 +265,8 @@
         .el-divider {
           margin: 100px auto 0;
           width: 50%;
-          .el-divider__text{
+
+          .el-divider__text {
             color: #8c939d;
           }
         }

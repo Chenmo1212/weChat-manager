@@ -876,6 +876,15 @@
     created() {
       this.getKeywordLists();
 
+      console.log(this.$route.params.hasLogin);
+      if(this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin){
+        this.$message("您尚未登录，请先登录后使用");
+        this.$router.push({name: 'login', params: {
+          checkedIndex: 0
+          }
+        });
+      }
+
       // 屏幕宽度小于1200
       let screenWidth = document.body.offsetWidth;
       // console.log(screenWidth);
@@ -929,7 +938,7 @@
         // console.log(left.style.marginLeft)
         // console.log(left.style.width)
       }
-      if (screenWidth >= 992 && screenWidth < 1200) {
+      if (screenWidth >= 768 && screenWidth < 1200) {
         left.style.marginLeft = 0;
         left.style.width = 100 + "px";
         this.drawerSize = "100%";
