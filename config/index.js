@@ -10,8 +10,21 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
-
+    proxyTable: {
+      // 下面是接口的路径，我的接口 地址是https://api.powerrain.cn/
+      '/v1/**': {
+        // 需要转发代理的域名
+        target: 'https://api.powerrain.cn/',
+        // 如果是https接口，需要配置这个参数
+        secure: true,
+        // 如果接口跨域，需要进行这个参数配置
+        changeOrigin: true,
+        // 这是一个通配符，设置完了之后每个接口都要在前面加上/v1（特别注意这一点）
+        // pathRewrite: {
+        //   '^/v1': '/'
+        // }
+      },
+    },
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
@@ -20,7 +33,7 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+
     /**
      * Source Maps
      */
