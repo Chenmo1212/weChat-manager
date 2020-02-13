@@ -172,65 +172,6 @@
           </el-form-item>
         </el-form>
 
-        <!--图文选择-->
-        <el-dialog
-          title="选择图文"
-          :modal="false"
-          :visible.sync="dialogVisible"
-          @open="openDialog"
-          width="50%">
-          <el-row style="width: 100%;">
-            <el-input
-              placeholder="关键词搜索"
-              v-model="search"
-              @blur="searchBlur"
-              @keyup.enter.native="searchData()">
-              <i slot="suffix" class="el-input__icon el-icon-search" @click="searchData"></i>
-            </el-input>
-
-            <el-divider></el-divider>
-
-            <el-row class="newsCard-box" style="width: 100%;" v-loading="dialogLoading">
-              <el-col v-for="(item, index) in newsLists" :key="index" :span="22" :offset="1">
-                <el-card :body-style="{ padding: '0px' }" shadow="hover" :class="{'checked': index === checkedIndex }"
-                         @click.native="checkedIndex = index">
-                  <el-row>
-                    <el-col :span="8" style="width: 100px; padding: 14px;">
-                      <el-image
-                        style="width: 100%; height: 60px;display: block;"
-                        :src="item.content.news_item[0].thumb_url"
-                        fit="cover"
-                        class="image">
-                      </el-image>
-                    </el-col>
-                    <el-col :span="16">
-                      <el-row style="padding: 14px 14px 14px 0;text-align: left;">
-                        <el-row class="header text-ellipsis">{{item.content.news_item[0].title}}</el-row>
-                        <el-row class="content" :gutter="5">
-                          <el-col :span="16" class="digest text-ellipsis">{{item.content.news_item[0].digest}}</el-col>
-                          <el-col :span="8" class="date">{{item.content.update_time}}</el-col>
-                        </el-row>
-                      </el-row>
-                    </el-col>
-                  </el-row>
-                </el-card>
-              </el-col>
-            </el-row>
-          </el-row>
-          <el-pagination
-            :page-size="4"
-            @current-change="handleNewsCurrentChange"
-            :current-page.sync="newsListPage"
-            layout="prev, pager, next, jumper"
-            :total="newsTotal">
-          </el-pagination>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click.native="cancelDialog">取 消</el-button>
-            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-          </span>
-        </el-dialog>
-
-
         <div class="demo-drawer__footer">
           <el-button @click="cancelForm">取 消</el-button>
           <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading ? '提交中 ...' : '确定'
@@ -239,6 +180,66 @@
         </div>
       </div>
     </el-drawer>
+
+
+    <!--图文选择-->
+    <el-dialog
+      title="选择图文"
+      :modal="false"
+      :visible.sync="dialogVisible"
+      @open="openDialog"
+      width="50%">
+      <el-row style="width: 100%;">
+        <el-input
+          placeholder="关键词搜索"
+          v-model="search"
+          @blur="searchBlur"
+          @keyup.enter.native="searchData()">
+          <i slot="suffix" class="el-input__icon el-icon-search" @click="searchData"></i>
+        </el-input>
+
+        <el-divider></el-divider>
+
+        <el-row class="newsCard-box" style="width: 100%;" v-loading="dialogLoading">
+          <el-col v-for="(item, index) in newsLists" :key="index" :span="22" :offset="1">
+            <el-card :body-style="{ padding: '0px' }" shadow="hover" :class="{'checked': index === checkedIndex }"
+                     @click.native="checkedIndex = index">
+              <el-row>
+                <el-col :span="8" style="width: 100px; padding: 14px;">
+                  <el-image
+                    style="width: 100%; height: 60px;display: block;"
+                    :src="item.content.news_item[0].thumb_url"
+                    fit="cover"
+                    class="image">
+                  </el-image>
+                </el-col>
+                <el-col :span="16">
+                  <el-row style="padding: 14px 14px 14px 0;text-align: left;">
+                    <el-row class="header text-ellipsis">{{item.content.news_item[0].title}}</el-row>
+                    <el-row class="content" :gutter="5">
+                      <el-col :span="16" class="digest text-ellipsis">{{item.content.news_item[0].digest}}</el-col>
+                      <el-col :span="8" class="date">{{item.content.update_time}}</el-col>
+                    </el-row>
+                  </el-row>
+                </el-col>
+              </el-row>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-row>
+      <el-pagination
+        :page-size="4"
+        @current-change="handleNewsCurrentChange"
+        :current-page.sync="newsListPage"
+        layout="prev, pager, next, jumper"
+        :total="newsTotal">
+      </el-pagination>
+      <span slot="footer" class="dialog-footer">
+            <el-button @click.native="cancelDialog">取 消</el-button>
+            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+          </span>
+    </el-dialog>
+
 
     <!--上传抽屉-->
     <el-drawer
@@ -948,6 +949,9 @@
     }
   }
 
+  .hidden {
+    overflow: hidden;
+  }
   .text-ellipsis {
     overflow: hidden;
     white-space: nowrap;
@@ -1124,38 +1128,46 @@
 
 
   /*添加关键词抽屉*/
-  .newsMsg {
-    margin-top: 10px;
+  /deep/ .el-drawer.ltr {
+    overflow-y: auto;
+  }
+  .el-drawer {
+    .newsMsg {
+      margin-top: 10px;
 
-    .card-box {
-      background-color: #fff;
-      width: 100%;
-      height: 90px;
-      border: 1px dashed #d9d9d9;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .card-box:hover {
-      border-color: #4d4d4d;
-    }
-
-    .add-news-icon {
-      text-align: center;
-      line-height: 90px;
-      font-size: 17px;
-      color: #8c939d;
-    }
-
-    .el-card {
-      .header {
-        color: #606266;
+      .card-box {
+        background-color: #fff;
+        width: 100%;
+        height: 90px;
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
       }
 
-      .content {
-        font-size: 12px;
+      .card-box:hover {
+        border-color: #4d4d4d;
+      }
+
+      .add-news-icon {
+        text-align: center;
+        line-height: 90px;
+        font-size: 17px;
         color: #8c939d;
       }
+
+      .el-card {
+        .header {
+          color: #606266;
+        }
+
+        .content {
+          font-size: 12px;
+          color: #8c939d;
+        }
+      }
+    }
+    .demo-drawer__footer {
+      margin: 20px 0 ;
     }
   }
 
