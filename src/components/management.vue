@@ -213,7 +213,7 @@
                     <el-row class="header text-ellipsis">{{item.content.news_item[0].title}}</el-row>
                     <el-row class="content" :gutter="5">
                       <el-col :span="16" class="digest text-ellipsis">{{item.content.news_item[0].digest}}</el-col>
-                      <el-col :span="8" class="date">{{item.content.update_time}}</el-col>
+                      <el-col :span="8" class="date">{{item.content.update_date}}</el-col>
                     </el-row>
                   </el-row>
                 </el-col>
@@ -264,7 +264,7 @@
 </template>
 
 <script>
-  import {getArticleCount, getToken, getArticleLists, getKeywordLists, delKeywords, addKeywords} from '../axios/api';
+  import { getKeywordLists, getArticleLists, delKeywords, updateKeywords, addKeywords} from '../axios/api';
 
   export default {
     keywords: "management",
@@ -837,7 +837,6 @@
       },
       // 获取素材列表
       getArticleLists(begin) {
-        this.getToken();
 
         console.log("获取素材列表");
         console.log("begin：", begin);
@@ -846,8 +845,8 @@
           console.log("数组：", this.newsLists);
           console.log("素材列表：", res.data);
           this.dialogLoading = false;
-          this.newsTotal = res.data.total_count;
-          this.newsLists = res.data.item;
+          this.newsTotal = res.data.material.total_count;
+          this.newsLists = res.data.material.item;
 
           // 时间戳转日期
           for (var i = 0; i < 4; i++) {
@@ -864,17 +863,19 @@
       // 获取关键词列表
       getKeywordLists() {
         console.log("获取关键词列表");
+        this.loading = true;
         const that = this;
         getKeywordLists().then(res => {
           console.log(JSON.parse(res.data.arr));
-          that.screenTableData = JSON.parse(res.data.arr)
+          that.screenTableData = JSON.parse(res.data.arr);
+          that.loading = false;
         }).catch(err => {
           console.log(err)
         })
       }
     },
     created() {
-      this.getKeywordLists();
+
 
       console.log(this.$route.params.hasLogin);
       if(this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin){
@@ -883,7 +884,10 @@
           checkedIndex: 0
           }
         });
+        return ;
       }
+
+      this.getKeywordLists();
 
       // 屏幕宽度小于1200
       let screenWidth = document.body.offsetWidth;
