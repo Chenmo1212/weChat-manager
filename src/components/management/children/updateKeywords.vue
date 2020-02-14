@@ -9,6 +9,7 @@
       ref="drawer"
       :size="drawerSize"
       :withHeader=false
+      :destroy-on-close=true
     >
       <div class="header">
         <h3>添加新的关键词</h3>
@@ -143,7 +144,7 @@
       <span slot="footer" class="dialog-footer">
             <el-button @click.native="cancelDialog">取 消</el-button>
             <el-button type="primary" @click="submitDialog">确 定</el-button>
-          </span>
+      </span>
     </el-dialog>
 
   </div>
@@ -155,7 +156,7 @@
   export default {
     name: "updateKeywords",
     //父组件通过props属性传递进来的数据
-    props: ['isAddKeywords', 'formData'],
+    props: ['isAddKeywords', 'drawerSize', 'dialogWidth'],
     data() {
       return {
         loading: false,
@@ -167,7 +168,6 @@
         // isAddKeywords: true,
 
         // 抽屉宽度
-        drawerSize: "40%",
 
         // 表单内容
         form: {
@@ -194,7 +194,6 @@
         checkedIndex: null,
         isSelectNews: false,
         dialogLoading: false,
-        dialogWidth: "50%",
         newsTotal: null,
         newsLists: [],
         // 选择类型

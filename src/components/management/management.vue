@@ -17,7 +17,7 @@
             <i class="el-icon-upload2"></i>
             <span slot="title">上传</span>
           </el-menu-item>
-          <el-menu-item index="4" @click="getArticleLists">
+          <el-menu-item index="4" @click="uploadKeywords = true">
             <i class="el-icon-download"></i>
             <span slot="title">下载</span>
           </el-menu-item>
@@ -88,18 +88,11 @@
 
     </el-container>
 
-    <update-keywords :isAddKeywords="isAddKeywords" ref="updateData"  @closeDrawer="updateKeyword"></update-keywords>
+    <!--添加关键词-->
+    <update-keywords :isAddKeywords="isAddKeywords" :drawerSize='drawerSize' :dialogWidth='dialogWidth' ref="updateData"  @closeDrawer="updateKeyword"></update-keywords>
 
-    <!--上传抽屉-->
-    <el-drawer
-      title="我是标题"
-      :visible.sync="uploadKeywords"
-      :size="drawerSize"
-      :with-header="false">
-      <div class="upload-drawer__content">
-        <el-row>1. 请先下载模板，按照模板填写问题和答案</el-row>
-      </div>
-    </el-drawer>
+    <!--上传下载-->
+    <upload-file :uploadKeywords="uploadKeywords" :drawerSize='drawerSize' @closeDrawer="uploadFile"></upload-file>
 
     <!--menuBtn-->
     <nav class="cd-stretchy-nav" v-if="phoneWidth">
@@ -108,8 +101,8 @@
       </a>
       <ul class="cd-stretchy-nav-ul">
         <li><span @click="isAddKeywords = true"><i class="el-icon-plus"></i></span></li>
-        <li><span @click="getToken"><i class="el-icon-upload2"></i></span></li>
-        <li><span @click="getArticleLists"><i class="el-icon-download"></i></span></li>
+        <li><span @click="uploadKeywords = true"><i class="el-icon-upload2"></i></span></li>
+        <li><span @click="uploadKeywords = true"><i class="el-icon-download"></i></span></li>
       </ul>
       <span aria-hidden="true" class="stretchy-nav-bg"></span>
     </nav>
@@ -120,6 +113,7 @@
 <script>
   import {getKeywordLists, getArticleLists, delKeywords, updateKeywords, addKeywords} from '../../axios/api';
   import updateVue from './children/updateKeywords'
+  import uploadVue from './children/uploadFile'
 
   export default {
     keywords: "management",
@@ -398,9 +392,7 @@
 
         // 屏幕宽度
         screenWidth: null,
-
-        // 表单内容
-        formData: {},
+        dialogWidth: null,
 
         // 表格宽高
         cellWidth: null,
@@ -484,6 +476,9 @@
 
       },
 
+      uploadFile(){
+        this.uploadKeywords = false;
+      },
       // 页面大小编辑
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`);
@@ -622,6 +617,7 @@
     ,
     components: {
       updateKeywords: updateVue,
+      uploadFile: uploadVue,
     }
     ,
     created() {
@@ -645,6 +641,7 @@
         this.isCollapse = true;
         this.cellWidth = 68;
         this.dateCellWidth = 90;
+        this.dialogWidth = "80%";
         this.maxTableHeight = 740;
         this.pageSize = 13;
       }
@@ -684,10 +681,12 @@
       if (screenWidth === 1920) {
         left.style.marginLeft = 200 + "px";
         left.style.width = 300 + "px";
+        this.dialogWidth = "50%";
       }
       if (screenWidth >= 1200 && screenWidth < 1920) {
         left.style.marginLeft = 0;
         left.style.width = 300 + "px";
+        this.dialogWidth = "60%";
         // console.log(left.style.marginLeft)
         // console.log(left.style.width)
       }
@@ -704,7 +703,7 @@
         // left.style.width = 100 + "px";
         this.phoneWidth = true;
         this.drawerSize = "100%";
-        this.dialogWidth = "80%";
+        this.dialogWidth = "90%";
         // console.log(left.style.marginLeft)
         // console.log(left.style.width)
       }
