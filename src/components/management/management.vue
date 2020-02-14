@@ -3,7 +3,7 @@
     <el-container>
 
       <el-aside id="el-aside" v-if="!phoneWidth">
-        <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleCloseKeywords"
+        <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen"
                  :collapse="isCollapse">
           <el-menu-item index="1">
             <i class="el-icon-s-data"></i>
@@ -67,7 +67,7 @@
             </template>
             <template slot-scope="scope">
               <el-button icon="el-icon-edit" :class="{'phoneStyle': phoneWidth}"
-                         @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+                         @click="handleEdit(scope.row)" circle></el-button>
               <el-button icon="el-icon-delete" :class="{'phoneStyle': phoneWidth}"
                          @click="handleDelete(scope.$index, scope.row)" circle></el-button>
             </template>
@@ -88,153 +88,7 @@
 
     </el-container>
 
-    <!--新增抽屉-->
-    <el-drawer
-      title="添加新的关键词"
-      :before-close="handleCloseKeywords"
-      :visible.sync="isAddKeywords"
-      direction="ltr"
-      ref="drawer"
-      :size="drawerSize"
-      :withHeader=false
-    >
-      <div class="header">
-        <h3>添加新的关键词</h3>
-      </div>
-      <div class="demo-drawer__content">
-        <el-form :model="form">
-          <el-form-item label="关键词" :label-width="formLabelWidth">
-            <el-col :span="20">
-              <el-input v-model="form.row.keywords" autocomplete="off" placeholder="多个关键词请用空格隔开：例如：美丽 漂亮 好看"></el-input>
-            </el-col>
-          </el-form-item>
-          <el-form-item label="内容" :label-width="formLabelWidth">
-            <!--文本消息-->
-            <el-row class="textMsg">
-              <el-col :span="20">
-                <div style="text-align: left;">1：文本消息</div>
-                <el-input
-                  type="textarea"
-                  :autosize="{ minRows: 4}"
-                  placeholder="请输入内容"
-                  v-model="form.row.content">
-                </el-input>
-                <div style="text-align: left;">请不要多于1000字否则无法发送！</div>
-              </el-col>
-            </el-row>
-            <!--图文消息-->
-            <el-row class="newsMsg">
-              <el-col :span="20">
-                <div style="text-align: left;">2：图文消息
-                  <el-button plain size="mini" style="border:none" :disabled="checkedIndex === null"
-                             @click.native="checkedIndex = null">重新选择
-                  </el-button>
-                </div>
-                <div class="card-box" @click="dialogVisible = true" v-if="checkedIndex === null">
-                  <i class="el-icon-plus add-news-icon"></i>
-                </div>
-                <el-card :body-style="{ padding: '0px' }" shadow="hover" v-else="checkedIndex !== null"
-                         style="width: 100%;">
-                  <el-row style="width: 100%;">
-                    <el-col :span="8" style="width: 100px; padding: 14px;">
-                      <el-image
-                        style="width: 100%; height: 60px;display: block;"
-                        :src="newsLists[checkedIndex].content.news_item[0].thumb_url"
-                        fit="cover"
-                        class="image">
-                      </el-image>
-                    </el-col>
-                    <el-col :span="17">
-                      <el-row style="padding: 14px 14px 14px 0;text-align: left;">
-                        <el-row class="header text-ellipsis">{{newsLists[checkedIndex].content.news_item[0].title}}
-                        </el-row>
-                        <el-row class="content" :gutter="3">
-                          <el-col :span="16" class="digest text-ellipsis">
-                            {{newsLists[checkedIndex].content.news_item[0].digest}}
-                          </el-col>
-                          <el-col :span="8" class="date">{{newsLists[checkedIndex].content.update_time}}</el-col>
-                        </el-row>
-                      </el-row>
-                    </el-col>
-                  </el-row>
-                </el-card>
-              </el-col>
-            </el-row>
-
-            <!--图文类型-->
-            <el-row class="newsType" style="margin:10px 0">
-              <el-row style="text-align: left;">
-                <div style="text-align: left;">3：图文类型</div>
-                <el-checkbox-group v-model="form.row.news.type">
-                  <el-col v-for="(item, index) in newsTypeArr" :key="index" :span="6">
-                    <el-checkbox :label="item"></el-checkbox>
-                  </el-col>
-                </el-checkbox-group>
-              </el-row>
-            </el-row>
-          </el-form-item>
-        </el-form>
-
-        <div class="demo-drawer__footer">
-          <el-button @click="cancelForm">取 消</el-button>
-          <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading ? '提交中 ...' : '确定' }}
-          </el-button>
-        </div>
-      </div>
-    </el-drawer>
-
-
-    <!--图文选择-->
-    <el-dialog
-      title="选择图文"
-      :modal="false"
-      :visible.sync="dialogVisible"
-      @open="openDialog"
-      :width="dialogWidth">
-      <el-row style="width: 100%;">
-
-        <el-divider></el-divider>
-
-        <el-row class="newsCard-box" style="width: 100%;" v-loading="dialogLoading">
-          <el-col v-for="(item, index) in newsLists" :key="index" :span="22" :offset="1">
-            <el-card :body-style="{ padding: '0px' }" shadow="hover" :class="{'checked': index === checkedIndex }"
-                     @click.native="checkedIndex = index">
-              <el-row>
-                <el-col :span="8" style="width: 100px; padding: 14px;">
-                  <el-image
-                    style="width: 100%; height: 60px;display: block;"
-                    :src="item.content.news_item[0].thumb_url"
-                    fit="cover"
-                    class="image">
-                  </el-image>
-                </el-col>
-                <el-col :span="16">
-                  <el-row style="padding: 14px 14px 14px 0;text-align: left;">
-                    <el-row class="header text-ellipsis">{{item.content.news_item[0].title}}</el-row>
-                    <el-row class="content" :gutter="5">
-                      <el-col :span="16" class="digest text-ellipsis">{{item.content.news_item[0].digest}}</el-col>
-                      <el-col :span="8" class="date">{{item.content.update_date}}</el-col>
-                    </el-row>
-                  </el-row>
-                </el-col>
-              </el-row>
-            </el-card>
-          </el-col>
-        </el-row>
-      </el-row>
-      <el-pagination
-        :page-size="4"
-        @current-change="handleNewsCurrentChange"
-        :current-page.sync="newsListPage"
-        layout="prev, pager, next, jumper"
-        :total="newsTotal">
-      </el-pagination>
-      <span slot="footer" class="dialog-footer">
-            <el-button @click.native="cancelDialog">取 消</el-button>
-            <el-button type="primary" @click="submitDialog">确 定</el-button>
-          </span>
-    </el-dialog>
-
+    <update-keywords :isAddKeywords="isAddKeywords" ref="updateData"  @closeDrawer="updateKeyword"></update-keywords>
 
     <!--上传抽屉-->
     <el-drawer
@@ -264,7 +118,8 @@
 </template>
 
 <script>
-  import { getKeywordLists, getArticleLists, delKeywords, updateKeywords, addKeywords} from '../axios/api';
+  import {getKeywordLists, getArticleLists, delKeywords, updateKeywords, addKeywords} from '../../axios/api';
+  import updateVue from './children/updateKeywords'
 
   export default {
     keywords: "management",
@@ -544,6 +399,9 @@
         // 屏幕宽度
         screenWidth: null,
 
+        // 表单内容
+        formData: {},
+
         // 表格宽高
         cellWidth: null,
         dateCellWidth: 90,
@@ -555,40 +413,6 @@
         isAddKeywords: false,
         loading: false,
         drawerSize: "40%",
-        // 表单内容
-        form: {
-          index: '',  // 关键词的下标
-          row: {      // 内容
-            keywords: '', // 关键词，Str
-            content: '',  // 根据关键词回复的内容，Str
-            num: 0,     // 用户触发的次数， Int
-            date: null,   // 新增关键词的时间（我转成日期字符串），Str
-            news: {       // 图文内容， Obj（dict）
-              title: "",      // 图文的标题，Str
-              digest: "",     // 图文的摘要，Str
-              update_time: "",    // 图文的更新时间， timestamp 10位时间戳格式
-              cover: "",      // 图文封面图的链接，Str
-              url: "",        // 图文的链接，Str
-              type: [], // 图文的类型，Arr（list）
-            }
-          },
-        },
-
-        // 选择图文
-        dialogVisible: false,
-        newsListPage: 1,
-        checkedIndex: null,
-        isSelectNews: false,
-        dialogLoading: false,
-        dialogWidth: "50%",
-        newsTotal: null,
-        newsLists: [],
-        // 选择类型
-        newsTypeArr: ["Win", "Mac", "Android", "iOS", "教程", "技巧", "网站", "小程序"],
-
-        // 表单标签宽度
-        formLabelWidth: '15%',
-
         // 上传关键词抽屉
         uploadKeywords: false,
 
@@ -596,64 +420,55 @@
       }
     },
     methods: {
-      openDialog() {
-        console.log("默认打开");
-        this.dialogLoading = true;
-        this.getArticleLists(0);
-      },
-      // 跳转页
-      handleNewsCurrentChange(val) {
-        this.newsListPage = val;
-        console.log(`素材当前页: ${val}`);
-        this.dialogLoading = true;
-        this.getArticleLists(val * 4)
-      },
-      // 关闭dialog
-      cancelDialog() {
-        this.dialogVisible = false;
-        this.checkedIndex = null;
-      },
-      // 确定dialog
-      submitDialog(){
-        console.log(this.newsLists[this.checkedIndex]);
-        var item = this.newsLists[this.checkedIndex];
-        console.log(item.content.news_item[0]);
-        this.form.row.news.title = item.content.news_item[0].title;
-        this.form.row.news.cover = "http://img01.store.sogou.com/net/a/04/link?appid=100520029&url=" + item.content.news_item[0].thumb_url;
-        this.form.row.news.url = item.content.news_item[0].url;
-        this.form.row.news.digest = item.content.news_item[0].digest;
-        this.form.row.news.update_time = item.content.update_time;
-        this.dialogVisible = false;
-        console.log(this.form.row.news.update_time)
+      // 添加关键词更新数据
+      updateKeyword(data) {
+        console.log(data);
+        if (data.flag && data.getKeywordLists) {
+          console.log("情况1出现");
+          this.getKeywordLists();
+          this.isAddKeywords = false;
+        } else if (data.flag) {
+          // 选中的图文序号
+          var index = data.data.index;
+          this.screenTableData[index] = data.data.row;
+        } else {
+          this.isAddKeywords = false;
+        }
       },
       handleOpen() {
         console.log("默认打开");
       },
       // 编辑关键词
-      handleEdit(index, row) {
-        console.log(index, row);
-        this.form.keywords = row.keywords;
-        this.form.content = row.content;
-        this.form.index = row.index;
-        this.form.row = row;
+      handleEdit(row) {
+        // console.log(row);
         this.isAddKeywords = true;
+        this.$refs.updateData.$emit('childMethod', row) // 触发监听事件
       },
 
       // 删除关键词
       handleDelete(index, row) {
-        console.log(index, row);
+        // console.log(index, row);
         const that = this;
         this.$confirm('确定删除该关键词吗？删除后不可恢复！')
           .then(_ => {
-            console.log("点了确定");
+            // console.log("点了确定");
             // this.loading = true;
-            console.log(row._id.$oid);
+            // console.log(row._id.$oid);
 
             delKeywords(row._id.$oid).then(res => {
-              console.log(res)
-              that.getKeywordLists()
+              // console.log(res);
+              that.getKeywordLists();
+              this.$notify({
+                title: '成功',
+                message: '关键词删除成功',
+                type: 'success'
+              });
             }).catch(err => {
-              console.log(err)
+              console.log(err);
+              this.$notify.error({
+                title: '错误',
+                message: '关键词添加失败'
+              });
             })
 
 
@@ -716,77 +531,6 @@
         console.log("搜索框失去焦点");
         if (this.search === "") this.screenTableData = this.totalTableData;
       },
-      // 手动关闭抽屉(提交关键词)
-      handleCloseKeywords(done) {
-        if (this.loading) {
-          return;
-        }
-        const that = this;
-        that.$confirm('确定要提交新的关键词吗？')
-          .then(_ => {
-            console.log("点了确定");
-            that.loading = true;
-
-            // 时间戳转换日期
-            that.form.row.date = new Date().Format("yyyy-MM-dd");
-            that.screenTableData[that.form.index] = that.form.row;
-            console.log(that.form);
-
-            var item = that.form.row;
-            console.log(item);
-            addKeywords(item).then(res => {
-              console.log(res);
-              that.timer = setTimeout(() => {
-                done();
-                // 动画关闭需要一定的时间
-                setTimeout(() => {
-                  this.loading = false;
-                  that.clearForm();
-                  that.getKeywordLists()
-                }, 400);
-              }, 2000);
-
-            }).catch(err => {
-              console.log(err);
-              that.timer = setTimeout(() => {
-                done();
-                // 动画关闭需要一定的时间
-                setTimeout(() => {
-                  this.loading = false;
-                  that.clearForm();
-                }, 400);
-              }, 2000);
-            });
-
-          })
-          .catch(_ => {
-            console.log("点了取消");
-            this.loading = false;
-            this.isAddKeywords = false;
-            this.clearForm()
-          });
-      },
-      cancelForm() {
-        this.loading = false;
-        this.isAddKeywords = false;
-        this.clearForm()
-        clearTimeout(this.timer);
-      },
-      clearForm(){  // 清空form
-        console.log("清空form")
-        this.form.index = "";
-        this.form.row.keywords = "";
-        this.form.row.content = "";
-        this.form.row.num = "";
-        this.form.row.date = null;
-        this.form.row.news.title = "";
-        this.form.row.news.digest = "";
-        this.form.row.news.update_time = "";
-        this.form.row.news.cover = "";
-        this.form.row.news.url = "";
-        this.form.row.news.type = [];
-        this.checkedIndex = null;
-      },
 
       // 手机模式触发菜单
       trigger() {
@@ -835,6 +579,7 @@
           console.log(err)
         })
       },
+
       // 获取素材列表
       getArticleLists(begin) {
 
@@ -866,25 +611,29 @@
         this.loading = true;
         const that = this;
         getKeywordLists().then(res => {
-          console.log(JSON.parse(res.data.arr));
+          // console.log(JSON.parse(res.data.arr));
           that.screenTableData = JSON.parse(res.data.arr);
           that.loading = false;
         }).catch(err => {
           console.log(err)
         })
       }
-    },
+    }
+    ,
+    components: {
+      updateKeywords: updateVue,
+    }
+    ,
     created() {
-
-
       console.log(this.$route.params.hasLogin);
-      if(this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin){
+      if (this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin) {
         this.$message("您尚未登录，请先登录后使用");
-        this.$router.push({name: 'login', params: {
-          checkedIndex: 0
+        this.$router.push({
+          name: 'login', params: {
+            checkedIndex: 0
           }
         });
-        return ;
+        return;
       }
 
       this.getKeywordLists();
@@ -1172,85 +921,13 @@
     overflow-y: auto;
   }
 
-  /deep/ .el-drawer.ltr::-webkit-scrollbar
-  {
+  /deep/ .el-drawer.ltr::-webkit-scrollbar {
     display: none
   }
-
-  .el-drawer {
-    .newsMsg {
-      margin-top: 10px;
-
-      .card-box {
-        background-color: #fff;
-        width: 100%;
-        height: 90px;
-        border: 1px dashed #d9d9d9;
-        border-radius: 6px;
-        cursor: pointer;
-      }
-
-      .card-box:hover {
-        border-color: #4d4d4d;
-      }
-
-      .add-news-icon {
-        text-align: center;
-        line-height: 90px;
-        font-size: 17px;
-        color: #8c939d;
-      }
-
-      .el-card {
-        .header {
-          color: #606266;
-        }
-
-        .content {
-          font-size: 12px;
-          color: #8c939d;
-        }
-      }
-    }
-
-    .demo-drawer__footer {
-      margin: 20px 0;
-    }
-  }
-
 
   .upload-drawer__content {
 
   }
 
-  .el-dialog {
-    .newsCard-box {
-      height: 400px;
-      overflow: auto;
-    }
-
-    .checked {
-      border: 1px solid #4d4d4d;
-    }
-
-    .el-card {
-      width: 100%;
-      margin: 0 auto 10px;
-      padding: 0;
-
-      .header {
-        color: #606266;
-        line-height: 24px;
-        font-size: 16px;
-      }
-
-      .content {
-        font-size: 14px;
-        line-height: 24px;
-        margin-top: 10px;
-        color: #8c939d;
-      }
-    }
-  }
 
 </style>

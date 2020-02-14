@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import home from '@/components/home'
-import management from '@/components/management'
+import management from '@/components/management/management'
 import login from '@/components/login'
 
 Vue.use(Router);
