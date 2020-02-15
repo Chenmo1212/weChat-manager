@@ -120,7 +120,7 @@
                     class="image">
                   </el-image>
                 </el-col>
-                <el-col :span="16">
+                <el-col :span="15">
                   <el-row style="padding: 14px 14px 14px 0;text-align: left;">
                     <el-row class="header text-ellipsis">{{item.content.news_item[0].title}}</el-row>
                     <el-row class="content" :gutter="5">
@@ -146,7 +146,7 @@
             <el-button type="primary" @click="submitDialog">确 定</el-button>
       </span>
     </el-dialog>
-
+    <div class="header content"></div>
   </div>
 </template>
 
@@ -369,7 +369,7 @@
         var Y = date.getFullYear() + '-';
         var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
         var D = date.getDate() + ' ';
-        return Y + M + D;
+        return  M + D;
       },
 
       // 获取素材列表
@@ -400,9 +400,18 @@
     mounted() {
       this.updateData(); //事件监听
 
+      // 获取dialog
+      var dialog = document.getElementsByClassName("el-dialog")[0];
+      var header = document.getElementsByClassName("header")[0];
+      var content = document.getElementsByClassName("content")[0];
+      console.log(dialog)
       let screenWidth = document.body.clientWidth;
       if (screenWidth < 768) {
         this.layout = "total, prev,jumper, next";
+        dialog.style.marginTop = 0;
+        dialog.style.marginBottom = 0
+        header.style.fontSize = "14px";
+        content.style.fontSize = "12px";
       }
     }
   }
@@ -419,6 +428,11 @@
     display: none
   }
 
+  .text-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
   .el-drawer {
     .newsMsg {
       margin-top: 10px;
