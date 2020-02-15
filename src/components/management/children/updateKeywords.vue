@@ -138,7 +138,7 @@
         :page-size="4"
         @current-change="handleNewsCurrentChange"
         :current-page.sync="newsListPage"
-        layout="prev, pager, next, jumper"
+        :layout="layout"
         :total="newsTotal">
       </el-pagination>
       <span slot="footer" class="dialog-footer">
@@ -196,6 +196,7 @@
         dialogLoading: false,
         newsTotal: null,
         newsLists: [],
+        layout: 'prev, pager, next, jumper',
         // 选择类型
         newsTypeArr: ["Win", "Mac", "Android", "iOS", "教程", "技巧", "网站", "小程序"],
 
@@ -398,11 +399,26 @@
     },
     mounted() {
       this.updateData(); //事件监听
+
+      let screenWidth = document.body.clientWidth;
+      if (screenWidth < 768) {
+        this.layout = "total, prev,jumper, next";
+      }
     }
   }
 </script>
 
 <style lang="scss" scoped>
+
+  /*添加关键词抽屉*/
+  /deep/ .el-drawer.ltr {
+    overflow-y: auto;
+  }
+
+  /deep/ .el-drawer.ltr::-webkit-scrollbar {
+    display: none
+  }
+
   .el-drawer {
     .newsMsg {
       margin-top: 10px;

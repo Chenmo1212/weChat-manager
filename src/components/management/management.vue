@@ -79,8 +79,9 @@
             @current-change="handleCurrentChange"
             :current-page="currentPage"
             :page-size="pageSize"
+            :small="smallPage"
             :page-sizes="[10, 20, 50, 100]"
-            layout="total, sizes, prev, pager, next, jumper"
+            :layout="layout"
             :total="screenTableData.length">
           </el-pagination>
         </div>
@@ -151,6 +152,8 @@
         isAddKeywords: false,
         loading: false,
         drawerSize: "40%",
+        smallPage: false,
+        layout: "total, sizes, prev, pager, next, jumper",
         // 上传关键词抽屉
         uploadKeywords: false,
 
@@ -362,13 +365,11 @@
           console.log(err)
         })
       }
-    }
-    ,
+    },
     components: {
       updateKeywords: updateVue,
       uploadFile: uploadVue,
-    }
-    ,
+    },
     created() {
       console.log(this.$route.params.hasLogin);
       if (this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin) {
@@ -443,6 +444,7 @@
         left.style.marginLeft = 0;
         left.style.width = 100 + "px";
         this.drawerSize = "100%";
+        this.smallPage = true;
         this.dialogWidth = "80%";
         // console.log(left.style.marginLeft)
         // console.log(left.style.width)
@@ -452,9 +454,9 @@
         // left.style.width = 100 + "px";
         this.phoneWidth = true;
         this.drawerSize = "100%";
+        this.smallPage = true;
+        this.layout = "total, prev,jumper, next";
         this.dialogWidth = "90%";
-        // console.log(left.style.marginLeft)
-        // console.log(left.style.width)
       }
 
       // 表格数据
@@ -661,16 +663,6 @@
     background-size: contain;
     height: 50px;
     width: 50px;
-  }
-
-
-  /*添加关键词抽屉*/
-  /deep/ .el-drawer.ltr {
-    overflow-y: auto;
-  }
-
-  /deep/ .el-drawer.ltr::-webkit-scrollbar {
-    display: none
   }
 
   .upload-drawer__content {
