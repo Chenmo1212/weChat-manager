@@ -2,7 +2,6 @@
   <div id="updateKeywords">
     <!--新增抽屉-->
     <el-drawer
-      title="添加新的关键词"
       :before-close="handleCloseKeywords"
       :visible.sync="isAddKeywords"
       direction="ltr"
@@ -12,7 +11,8 @@
       :destroy-on-close=true
     >
       <div class="header">
-        <h3>添加新的关键词</h3>
+        <span style="font-size: 18px;font-weight: 700;margin: 20px 0;display: inline-block;">添加新的关键词</span>
+        <span @click="clearForm" style="font-size: 14px;color: #8c939d;cursor: pointer;">清空内容</span>
       </div>
       <div class="demo-drawer__content">
         <el-form :model="form">
@@ -199,6 +199,7 @@
         // 选择类型
         newsTypeArr: ["Win", "Mac", "Android", "iOS", "教程", "技巧", "网站", "小程序"],
 
+        isUpdate: false,
       }
     },
     methods: {
@@ -210,56 +211,82 @@
         const that = this;
         that.$confirm('确定要提交新的关键词吗？')
           .then(_ => {
+            let item;
             console.log("点了确定");
             that.loading = true;
 
             // 时间戳转换日期
             that.form.row.date = new Date().Format("yyyy-MM-dd");
 
-            this.$emit('closeDrawer', {flag: true, data: that.form.row, getKeywordLists: false});
-            // that.screenTableData[that.form.index] = that.form;
-            console.log(that.form);
-
-            var item = that.form.row;
-            console.log(item);
-            addKeywords(item).then(res => {
-              console.log("添加成功", res);
-              that.timer = setTimeout(() => {
-                console.log("成功后关闭动画");
-                this.loading = false;
-                that.clearForm();
-                this.$emit('closeDrawer', {flag: true, data: that.form.row, getKeywordLists: true});
-                this.$notify({
-                  title: '成功',
-                  message: '关键词添加成功',
-                  type: 'success'
-                });
-              }, 400);
-
-            }).catch(err => {
-              console.log("添加失败", err);
-              that.timer = setTimeout(() => {
-                done();
-                // 动画关闭需要一定的时间
-                setTimeout(() => {
+            if(this.isUpdate){ // 更新数据
+              // console.log(that.form);
+              item = {};
+              item.id = that.form.row._id.$oid;
+              item.keywords = that.form.row.keywords;
+              item.content = that.form.row.content;
+              item.news = that.form.row.news;
+              updateKeywords(item).then(res=>{
+                console.log(res.data);
+                that.timer = setTimeout(() => {
+                  console.log("成功后关闭动画");
                   this.loading = false;
-                  this.$notify.error({
-                    title: '错误',
-                    message: '关键词添加失败'
+                  this.$emit('closeDrawer', {flag: true, data:'', getKeywordLists: true});
+                  this.$notify({
+                    title: '成功',
+                    message: '关键词修改成功',
+                    type: 'success'
                   });
-                  // 子组件传父关闭抽屉
-                  this.$emit('closeDrawer', {flag: false});
-                  that.clearForm();
                 }, 400);
-              }, 2000);
-            });
+
+              }).catch(err=>{
+                console.log(err.data)
+              })
+
+            } else {           // 添加数据
+              let data = that.form.row;
+              this.$emit('closeDrawer', {flag: true, data: data, getKeywordLists: false});
+
+              item = that.form.row;
+              console.log(item);
+              addKeywords(item).then(res => {
+                console.log("添加成功", res);
+                that.timer = setTimeout(() => {
+                  console.log("成功后关闭动画");
+                  this.loading = false;
+                  that.clearForm();
+                  this.$emit('closeDrawer', {flag: true, data: data, getKeywordLists: true});
+                  this.$notify({
+                    title: '成功',
+                    message: '关键词添加成功',
+                    type: 'success'
+                  });
+                }, 400);
+
+              }).catch(err => {
+                console.log("添加失败", err);
+                that.timer = setTimeout(() => {
+                  done();
+                  // 动画关闭需要一定的时间
+                  setTimeout(() => {
+                    this.loading = false;
+                    this.$notify.error({
+                      title: '错误',
+                      message: '关键词添加失败'
+                    });
+                    // 子组件传父关闭抽屉
+                    this.$emit('closeDrawer', {flag: false});
+                    that.clearForm();
+                  }, 400);
+                }, 2000);
+              });
+            }
           })
           .catch(_ => {
             console.log("点了取消");
             this.loading = false;
             // 子组件传父关闭抽屉
             this.$emit('closeDrawer', {flag: false});
-            this.clearForm()
+            // this.clearForm()
           });
       },
 
@@ -269,7 +296,7 @@
         this.loading = false;
         // 子组件传父关闭抽屉
         this.$emit('closeDrawer', {flag: false});
-        this.clearForm();
+        // this.clearForm();
         clearTimeout(this.timer);
       },
       // 清空表格
@@ -289,11 +316,13 @@
         this.checkedIndex = null;
       },
 
+      // 更新数据
       updateData(){
         this.$on('childMethod', (res) => {
           // console.log('触发监听事件监听成功');
           // console.log(res);
-          this.form.row = res
+          this.form.row = res;
+          this.isUpdate = true;
         })
       },
 

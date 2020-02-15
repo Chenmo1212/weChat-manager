@@ -46,6 +46,7 @@
 </template>
 
 <script>
+  import {addExcel, resetExcel, downloadExcel} from '../../../axios/api';
   export default {
     name: "uploadFile",
     //父组件通过props属性传递进来的数据

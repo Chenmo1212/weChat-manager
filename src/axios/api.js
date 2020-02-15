@@ -1,4 +1,4 @@
-import {api1, api2} from "./fetch";
+import {api} from "./fetch";
 
 // api.js
 // 签名算法
@@ -12,12 +12,12 @@ export function getArticleLists(type, offset, count) {
   data.sign = CryptoJS.MD5(JSON.stringify(data).replace(/\"/g, "'")).toString().toUpperCase()
   let params = new URLSearchParams();
   params.append('data', JSON.stringify(data));
-  return api2.post('/wxpy/material', params)
+  return api.post('/wxpy/material', params)
 }
 
 // 获取关键词列表
 export function getKeywordLists() {
-  return api2.get('/keyword/get')
+  return api.get('/keyword/get')
 }
 
 // 添加关键词
@@ -27,7 +27,7 @@ export function addKeywords(item) {
   data.sign = CryptoJS.MD5(JSON.stringify(data).replace(/\"/g, "'")).toString().toUpperCase()
   let params = new URLSearchParams();
   params.append('data', JSON.stringify(data));
-  return api2.post('/keyword/insert', params)
+  return api.post('/keyword/insert', params)
 }
 
 // 删除关键词
@@ -36,16 +36,16 @@ export function delKeywords(id) {
   data.sign = CryptoJS.MD5(JSON.stringify(data).replace(/\"/g, "'")).toString().toUpperCase();
   let params = new URLSearchParams();
   params.append('data', JSON.stringify(data));
-  return api2.post('/keyword/del', params)
+  return api.post('/keyword/del', params)
 }
 
 // 更新关键词
-export function updateKeywords(id, keywords, content, news) {
-  let data = {id, keywords, content, news};
+export function updateKeywords(item) {
+  let data = {item};
   data.sign = CryptoJS.MD5(JSON.stringify(data).replace(/\"/g, "'")).toString().toUpperCase();
   let params = new URLSearchParams();
   params.append('data', JSON.stringify(data));
-  return api2.post('/keyword/update', params)
+  return api.post('/keyword/update', params)
 }
 
 
@@ -69,4 +69,9 @@ export function resetExcel(file) {
       'Content-Type': 'multipart/form-data',
     }
   })
+}
+
+// 获取关键词列表
+export function downloadExcel() {
+  return api.get('/excel/getaddr')
 }
