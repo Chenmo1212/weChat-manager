@@ -49,7 +49,7 @@
                 <el-card :body-style="{ padding: '0px' }" shadow="hover" v-else="checkedIndex !== null"
                          style="width: 100%;">
                   <el-row style="width: 100%;">
-                    <el-col :span="8" style="width: 100px; padding: 14px;">
+                    <el-col :span="8" style="padding: 14px;">
                       <el-image
                         style="width: 100%; height: 60px;display: block;"
                         :src="newsLists[checkedIndex].content.news_item[0].thumb_url"
@@ -57,7 +57,7 @@
                         class="image">
                       </el-image>
                     </el-col>
-                    <el-col :span="17">
+                    <el-col :span="16">
                       <el-row style="padding: 14px 14px 14px 0;text-align: left;">
                         <el-row class="header text-ellipsis">{{newsLists[checkedIndex].content.news_item[0].title}}
                         </el-row>
@@ -65,7 +65,7 @@
                           <el-col :span="16" class="digest text-ellipsis">
                             {{newsLists[checkedIndex].content.news_item[0].digest}}
                           </el-col>
-                          <el-col :span="8" class="date">{{newsLists[checkedIndex].content.update_time}}</el-col>
+                          <el-col :span="8" class="date">{{newsLists[checkedIndex].content.update_date}}</el-col>
                         </el-row>
                       </el-row>
                     </el-col>
@@ -112,7 +112,7 @@
             <el-card :body-style="{ padding: '0px' }" shadow="hover" :class="{'checked': index === checkedIndex }"
                      @click.native="checkedIndex = index">
               <el-row>
-                <el-col :span="8" style="width: 100px; padding: 14px;">
+                <el-col :span="8" style="padding: 14px;">
                   <el-image
                     style="width: 100%; height: 60px;display: block;"
                     :src="item.content.news_item[0].thumb_url"
@@ -120,7 +120,7 @@
                     class="image">
                   </el-image>
                 </el-col>
-                <el-col :span="15">
+                <el-col :span="16">
                   <el-row style="padding: 14px 14px 14px 0;text-align: left;">
                     <el-row class="header text-ellipsis">{{item.content.news_item[0].title}}</el-row>
                     <el-row class="content" :gutter="5">
