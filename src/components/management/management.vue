@@ -357,7 +357,7 @@
         getKeywordLists().then(res => {
           // console.log(res.data);
           // console.log(res.data.arr);
-          console.log(JSON.parse(res.data.arr));
+          // console.log(JSON.parse(res.data.arr));
           that.totalTableData = JSON.parse(res.data.arr);
           that.screenTableData = that.totalTableData;
           that.loading = false;
@@ -371,8 +371,14 @@
       uploadFile: uploadVue,
     },
     created() {
-      console.log(this.$route.params.hasLogin);
-      if (this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin) {
+
+      // 判断是否已经登录
+      if (localStorage.getItem('hasLogin')){
+        this.$message({
+          message: '您已登录~',
+          type: 'success'
+        });
+      } else if (this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin) {
         this.$message("您尚未登录，请先登录后使用");
         this.$router.push({
           name: 'login', params: {

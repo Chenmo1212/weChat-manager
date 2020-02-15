@@ -33,7 +33,7 @@
           </el-col>
           <el-col :span="4" class="hidden-xs-only">
             <div class="login-status">
-              <div>{{loginStatus}}</div>
+              <div @click="isLogin">{{loginStatus}}</div>
             </div>
           </el-col>
         </el-row>
@@ -92,6 +92,10 @@
       }
     },
     created() {
+      console.log(localStorage.getItem('hasLogin'));
+      this.hasLogin = !!localStorage.getItem('hasLogin');
+
+      console.log('this.hasLogin',this.hasLogin);
       console.log(this.$route.name);
       if (this.$route.name === "login") {
         this.checkedIndex = 0
@@ -122,6 +126,10 @@
         this.checkedIndex = obj.checkedIndex;
         console.log("是否登录", this.hasLogin)
       },
+      // 是否登录
+      isLogin(){
+        localStorage.clear();
+      }
     },
     mounted() {
       // const that = this;

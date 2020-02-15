@@ -36,8 +36,7 @@
                   <el-checkbox v-model="remember">记住密码</el-checkbox>
                 </div>
                 <div class="loginBtn">
-                  <el-button type="info" size="large" @click="toManagement" :loading="loading">{{ loading ? '登录中 ...' :
-                    '登 录' }}
+                  <el-button type="info" size="large" @click="toManagement" :loading="loading">{{ loading ? '登录中 ...' : '登 录' }}
                   </el-button>
                 </div>
               </div>
@@ -59,7 +58,7 @@
             prefix-icon="el-icon-user"
             size="large"
             class="input"
-            maxlength="10"
+            maxlength="16"
             clearable>
           </el-input>
           <el-input
@@ -96,32 +95,75 @@
         lineSpan: 1,
         loginSpan: 7,
         phoneSpan: 0,
-        loading: false
+        loading: false,
+
+
+        // 用户账户与密码
+        userList: [{
+          username: '160594753',
+          pwd: '160594753',
+        }, {
+          username: '862892309',
+          pwd: '862892309',
+        }, {
+          username: '',
+          pwd: '',
+        }, ]
       }
     },
     methods: {
       toManagement() {
-        this.loading = true;
-        setTimeout(() => {
-          this.loading = false;
-          this.$router.push({
-            name: "management",
-            params: {
-              hasLogin: true
-            }
-          });
-          this.$emit('getRouterName', {routeName: 'management', hasLogin: true});
-          this.$message({
-            message: '登录成功~',
-            type: 'success'
-          });
-        }, 400);
+        if (this.account === '' || this.password === ''){
+          this.$message("用户名或者密码不得为空");
+          return ;
+        }
 
+        // 定义开关
+        let flag = 0;
+        for (let i = 0;i<this.userList.length; i++){
+          if (this.userList[i].username === this.account && this.userList[i].pwd === this.password){
+            this.loading = true;
+            flag = 1;
+            setTimeout(() => {
+              this.loading = false;
+              this.$router.push({
+                name: "management",
+                params: {
+                  hasLogin: true
+                }
+              });
+              localStorage.setItem('hasLogin', 'true');
+              this.$emit('getRouterName', {routeName: 'management', hasLogin: true});
+            }, 400);
+          }
+        }
+
+        // 如果循环结束，没找到则返回错误信息
+        if (!flag) {
+          this.$message("账户或密码错误，请检查后重试~")
+        }
       }
     },
     created() {
       if (this.$route.params.hasLogin){
         this.$emit('getRouterName', {routeName: 'login', hasLogin: false, checkedIndex: 0});
+      }
+
+      // 判断是否已经登录
+      if (localStorage.getItem('hasLogin')){
+        // 如果已经登录
+
+        this.$router.push({
+          name: "management",
+          params: {
+            hasLogin: true
+          }
+        });
+        this.$emit('getRouterName', {routeName: 'management', hasLogin: true});
+        this.$message({
+          message: '您已登录~',
+          type: 'success'
+        });
       }
     },
     mounted() {
