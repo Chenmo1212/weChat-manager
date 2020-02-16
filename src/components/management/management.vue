@@ -13,11 +13,11 @@
             <i class="el-icon-plus"></i>
             <span slot="title">添加</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="uploadKeywords = true">
+          <el-menu-item index="3" @click="isUploadFile = true">
             <i class="el-icon-upload2"></i>
             <span slot="title">上传</span>
           </el-menu-item>
-          <el-menu-item index="4" @click="uploadKeywords = true">
+          <el-menu-item index="4" @click="isUploadFile = true">
             <i class="el-icon-download"></i>
             <span slot="title">下载</span>
           </el-menu-item>
@@ -93,7 +93,7 @@
     <update-keywords :isAddKeywords="isAddKeywords" :drawerSize='drawerSize' :dialogWidth='dialogWidth' ref="updateData"  @closeDrawer="updateKeyword"></update-keywords>
 
     <!--上传下载-->
-    <upload-file :uploadKeywords="uploadKeywords" :drawerSize='drawerSize' @closeDrawer="uploadFile"></upload-file>
+    <upload-file :isUploadFile="isUploadFile" :drawerSize='drawerSize' @closeUploadDrawer="uploadFile"></upload-file>
 
     <!--menuBtn-->
     <nav class="cd-stretchy-nav" v-if="phoneWidth">
@@ -102,8 +102,8 @@
       </a>
       <ul class="cd-stretchy-nav-ul">
         <li><span @click="isAddKeywords = true"><i class="el-icon-plus"></i></span></li>
-        <li><span @click="uploadKeywords = true"><i class="el-icon-upload2"></i></span></li>
-        <li><span @click="uploadKeywords = true"><i class="el-icon-download"></i></span></li>
+        <li><span @click="isUploadFile = true"><i class="el-icon-upload2"></i></span></li>
+        <li><span @click="isUploadFile = true"><i class="el-icon-download"></i></span></li>
       </ul>
       <span aria-hidden="true" class="stretchy-nav-bg"></span>
     </nav>
@@ -155,7 +155,7 @@
         smallPage: false,
         layout: "total, sizes, prev, pager, next, jumper",
         // 上传关键词抽屉
-        uploadKeywords: false,
+        isUploadFile: false,
 
         phoneWidth: false,
       }
@@ -225,8 +225,9 @@
 
       },
 
-      uploadFile(){
-        this.uploadKeywords = false;
+      // 关闭上传抽屉
+      uploadFile(data){
+        this.isUploadFile = data.flag;
       },
       // 页面大小编辑
       handleSizeChange(val) {

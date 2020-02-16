@@ -2,9 +2,10 @@
   <div id="uploadFile">
     <!--上传抽屉-->
     <el-drawer
-      :visible.sync="uploadKeywords"
+      :visible.sync="isUploadFile"
       :size="drawerSize"
       :show-close=true
+      :wrapperClosable="false"
       :with-header="false">
       <div class="header">
         <h3>上传/下载语料库</h3>
@@ -26,11 +27,13 @@
                   action="https://jsonplaceholder.typicode.com/posts/"
                   :on-preview="handlePreview"
                   :on-remove="handleRemove"
+                  accept=".xlsx"
+                  :on-change="resetHandleChange"
                   :before-remove="beforeRemove"
                   :limit="1"
-                  :on-exceed="handleExceed"
-                  :file-list="fileList">
-                  <el-button size="small" type="primary">重置上传</el-button>
+                  :on-exceed="resetHandleExceed"
+                  :file-list="resetFileList">
+                  <el-button size="small" type="primary" :disabled="resetDisabled">重置上传</el-button>
                 </el-upload>
               </el-col>
               <el-col :span="12">
@@ -40,10 +43,12 @@
                   :on-preview="handlePreview"
                   :on-remove="handleRemove"
                   :before-remove="beforeRemove"
+                  :on-change="addHandleChange"
                   :limit="1"
-                  :on-exceed="handleExceed"
-                  :file-list="fileList">
-                  <el-button size="small" type="primary">增补上传</el-button>
+                  accept=".xlsx"
+                  :on-exceed="addHandleExceed"
+                  :file-list="addFileList">
+                  <el-button size="small" type="primary" :disabled='addDisabled'>增补上传</el-button>
                 </el-upload>
               </el-col>
               <el-col :span="17">
@@ -78,30 +83,47 @@
   export default {
     name: "uploadFile",
     //父组件通过props属性传递进来的数据
-    props: ['uploadKeywords', 'drawerSize', 'dialogWidth'],
+    props: ['isUploadFile','drawerSize', 'dialogWidth'],
     data() {
       return {
-        fileList: []
+        addFileList: [],
+        resetFileList: [],
+        addDisabled: false,
+        resetDisabled: false,
+        // uploadKeywords: false
       }
     },
     methods: {
       // 取消
       cancelForm() {
-        console.log("取消")
+        console.log("取消");
         // 子组件传父关闭抽屉
-        this.$emit('closeDrawer');
+        this.$emit('closeUploadDrawer', {flag: false});
       },
 
       handleRemove(file, fileList) {
         console.log(file, fileList);
+        this.addDisabled = false;
+        this.resetDisabled = false;
       },
       handlePreview(file) {
         console.log(file);
       },
-      handleExceed(files, fileList) {
-        this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      resetHandleChange(file, resetFileList){
+        console.log("重置上传东西啦")
+        this.addDisabled = true
       },
-      beforeRemove(file, fileList) {
+      addHandleChange(file, addFileList){
+        console.log("增加上传东西啦")
+        this.resetDisabled = true
+      },
+      addHandleExceed(addFileList) {
+        this.$message.warning(`当前限制选择 1 个文件，您已经选择了 ${addFileList.length} 个文件，所以您不能再选择了~`);
+      },
+      resetHandleExceed(resetFileList) {
+        this.$message.warning(`当前限制选择 1 个文件，您已经选择了 ${resetFileList.length} 个文件，所以您不能再选择了~`);
+      },
+      beforeRemove(file) {
         return this.$confirm(`确定移除 ${file.name}？`);
       },
       submitUpload(){
