@@ -112,7 +112,7 @@
             <el-card :body-style="{ padding: '0px' }" shadow="hover" :class="{'checked': index === checkedIndex }"
                      @click.native="checkedIndex = index">
               <el-row>
-                <el-col :span="8" style="padding: 14px;">
+                <el-col :span="8" style="padding: 14px;max-width: 100px">
                   <el-image
                     style="width: 100%; height: 60px;display: block;"
                     :src="item.content.news_item[0].thumb_url"

@@ -422,7 +422,7 @@
       if (screenWidth === 1920) {
         left.style.marginLeft = 200 + "px";
         left.style.width = 300 + "px";
-        this.dialogWidth = "50%";
+        this.dialogWidth = "40%";
       }
       if (screenWidth >= 1200 && screenWidth < 1920) {
         left.style.marginLeft = 0;
