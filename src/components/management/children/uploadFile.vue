@@ -17,7 +17,7 @@
               1. 请先下载模板，按照模板填写问题和答案 <br>
               <el-button class="download" icon="el-icon-bottom" plain><a href="http://chenmo1212.site/web/mp/demo.xlsx">下载问答模板</a>
               </el-button>
-              <el-button class="download" icon="el-icon-bottom" plain>导出Excel文件</el-button>
+              <el-button class="download" icon="el-icon-bottom" plain @click="downloadFile">导出Excel文件</el-button>
             </el-row>
             <el-row>
               2. 请选择填好的问答文件进行导入 <br>
@@ -52,7 +52,7 @@
                 </el-upload>
               </el-col>
               <el-col :span="17">
-                <el-button style="margin: 30px 10px 0;display: inline-block;width: 100%;" size="small" @click="submitUpload" plain>上传到服务器</el-button>
+                <el-button style="margin: 30px 10px 0;display: inline-block;width: 100%;" size="small" @click="submitUpload" plain :loading="loading">{{loading ? '上传中...' : '上传到服务器'}}</el-button>
               </el-col>
             </el-row>
             <el-row>
@@ -90,6 +90,8 @@
         resetFileList: [],
         addDisabled: false,
         resetDisabled: false,
+        file: null,
+        loading: false,
         // uploadKeywords: false
       }
     },
@@ -110,12 +112,16 @@
         console.log(file);
       },
       resetHandleChange(file, resetFileList){
-        console.log("重置上传东西啦")
-        this.addDisabled = true
+        // console.log("重置上传东西啦");
+        this.file = file;
+        this.addDisabled = true;
+        this.resetFileList = resetFileList;
       },
       addHandleChange(file, addFileList){
-        console.log("增加上传东西啦")
-        this.resetDisabled = true
+        // console.log("增加上传东西啦");
+        this.file = file;
+        this.resetDisabled = true;
+        this.addFileList = addFileList;
       },
       addHandleExceed(addFileList) {
         this.$message.warning(`当前限制选择 1 个文件，您已经选择了 ${addFileList.length} 个文件，所以您不能再选择了~`);
@@ -124,10 +130,67 @@
         this.$message.warning(`当前限制选择 1 个文件，您已经选择了 ${resetFileList.length} 个文件，所以您不能再选择了~`);
       },
       beforeRemove(file) {
+        this.addFileList = [];
+        this.resetFileList = [];
         return this.$confirm(`确定移除 ${file.name}？`);
       },
-      submitUpload(){
+      downloadFile(){
+        downloadExcel().then(res=>{
+          console.log(res.data)
+          window.open("https://chenmo1212.site/wxapi" + res.data.addr)
+        })
+          .catch(err=>{
+            console.log(err)
+          })
+      },
 
+      submitUpload(){
+        console.log(this.resetFileList.length);
+        console.log(this.addFileList.length);
+        // 判断是增补还是重置
+        if(this.resetFileList.length){
+          console.log("这个是重置");
+          // console.log(this.file.raw);
+          this.loading = true;
+          // 如果重置的列表里有值
+          resetExcel(this.file.raw).then(res=>{
+            // console.log(res.data);
+            // console.log(res.data.errcode);
+            if (res.data.errcode === 200) {
+              this.$message("上传成功");
+              this.loading = false;
+              this.$emit('closeUploadDrawer', {flag: true});
+              this.resetFileList = [];
+            }
+          })
+            .catch(err=>{
+              console.log(err);
+              this.loading = false;
+              this.$message("上传出错，请检查Excel格式是否正确~");
+              this.resetFileList = [];
+            })
+        } else if (this.addFileList.length) {
+          console.log("这个是添加");
+          // 如果添补的列表里有值
+          addExcel(this.file).then(res=>{
+            // console.log(res.data)
+            if (res.data.errcode === 200) {
+              this.$message("上传成功");
+              this.loading = false;
+              this.$emit('closeUploadDrawer', {flag: true});
+              this.addFileList = [];
+            }
+          })
+            .catch(err=>{
+              console.log(err);
+              this.loading = false;
+              this.$message("上传出错，请检查Excel格式是否正确~");
+              this.addFileList = [];
+            })
+        } else {
+          // 两个列表里都没值
+          this.$message("请先选择文件再上传~")
+        }
       }
     }
   }

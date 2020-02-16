@@ -112,7 +112,7 @@
 </template>
 
 <script>
-  import {getKeywordLists, getArticleLists, delKeywords, updateKeywords, addKeywords} from '../../axios/api';
+  import {getKeywordLists, getArticleLists, delKeywords} from '../../axios/api';
   import updateVue from './children/updateKeywords'
   import uploadVue from './children/uploadFile'
 
@@ -227,7 +227,13 @@
 
       // 关闭上传抽屉
       uploadFile(data){
-        this.isUploadFile = data.flag;
+        console.log(data)
+        if(data.flag){
+          this.getKeywordLists();
+          this.isUploadFile = false;
+        } else {
+          this.isUploadFile = data.flag;
+        }
       },
       // 页面大小编辑
       handleSizeChange(val) {
@@ -303,33 +309,11 @@
         return Y + M + D;
       },
 
-      // 获取文章
-      getArticle() {
-        console.log("调用")
-        getArticleCount().then(res => {
-          console.log(res)
-        }).catch(err => {
-          console.log(err)
-        })
-      },
-
-      // 获取token
-      getToken() {
-        console.log("获取token");
-        getToken().then(res => {
-          console.log(res.data.access_token)
-          localStorage.setItem("token", res.data.access_token)
-          // console.log(localStorage.getItem("token"))
-        }).catch(err => {
-          console.log(err)
-        })
-      },
-
       // 获取素材列表
       getArticleLists(begin) {
 
         console.log("获取素材列表");
-        console.log("begin：", begin);
+        // console.log("begin：", begin);
         getArticleLists("news", begin, 4).then(res => {
           this.newsLists = [];
           console.log("数组：", this.newsLists);
@@ -343,7 +327,7 @@
             this.newsLists[i].content.update_date = this.timestampToTime(this.newsLists[i].content.update_time);
             this.newsLists[i].content.news_item[0].thumb_url = "http://img01.store.sogou.com/net/a/04/link?appid=100520029&url=" + this.newsLists[i].content.news_item[0].thumb_url;
           }
-          console.log(this.newsLists)
+          // console.log(this.newsLists)
         }).catch(err => {
           console.log(err);
           this.$message('出错了，请刷新重试~');

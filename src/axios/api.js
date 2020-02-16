@@ -55,7 +55,7 @@ export function addExcel(file) {
   param.append('excel', file);
   return api.put('/excel/add', param, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/x-www-form-urlencoded',
     }
   })
 }
