@@ -202,7 +202,7 @@
         newsLists: [],
         layout: 'prev, pager, next, jumper',
         // 选择类型
-        newsTypeArr: ["Win", "Mac", "Android", "iOS", "教程", "技巧", "网站", "小程序"],
+        newsTypeArr: ["win", "mac", "android", "ios", "course", "skill", "net", "smallSoft"],
 
         isUpdate: false,
       }
@@ -342,6 +342,24 @@
           // console.log(res);
           this.form.row = res;
           this.isUpdate = true;
+          // console.log(this.form.row.news.type)
+          this.checkedIndex = 0;
+
+          let obj = {
+            content: {
+              news_item: [{
+                thumb_url: null,
+                title: null,
+                digest: null,
+              }],
+              update_date: null,
+            }};
+
+          obj.content.news_item[0].thumb_url = res.news.cover;
+          obj.content.news_item[0].title = res.news.title;
+          obj.content.news_item[0].digest = res.news.digest;
+          obj.content.update_date = this.timestampToTime(res.news.update_time);
+          this.newsLists.push(obj)
         })
       },
 
@@ -422,7 +440,7 @@
       var dialog = document.getElementsByClassName("el-dialog")[0];
       var header = document.getElementsByClassName("header")[0];
       var content = document.getElementsByClassName("content")[0];
-      console.log(dialog)
+      // console.log(dialog)
       let screenWidth = document.body.clientWidth;
       if (screenWidth < 768) {
         this.layout = "total, prev,jumper, next";

@@ -316,8 +316,8 @@
         // console.log("begin：", begin);
         getArticleLists("news", begin, 4).then(res => {
           this.newsLists = [];
-          console.log("数组：", this.newsLists);
-          console.log("素材列表：", res.data);
+          // console.log("数组：", this.newsLists);
+          // console.log("素材列表：", res.data);
           this.dialogLoading = false;
           this.newsTotal = res.data.material.total_count;
           this.newsLists = res.data.material.item;
@@ -342,7 +342,7 @@
         getKeywordLists().then(res => {
           // console.log(res.data);
           // console.log(res.data.arr);
-          console.log(JSON.parse(res.data.arr));
+          // console.log(JSON.parse(res.data.arr));
           that.totalTableData = this.cleanData(JSON.parse(res.data.arr));
           that.screenTableData = that.totalTableData;
           that.loading = false;
