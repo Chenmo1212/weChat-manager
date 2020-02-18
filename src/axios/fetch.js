@@ -2,6 +2,7 @@ import axios from 'axios'
 
 export const api = axios.create({
   // baseURL: window.location.origin + '/wxapi/',
+  // baseURL: 'https://api.weixin.qq.com/cgi-bin/',
   baseURL: "https://chenmo1212.site" + '/wxapi/',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',

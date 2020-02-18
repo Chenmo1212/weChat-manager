@@ -172,7 +172,7 @@
         } else if (this.addFileList.length) {
           console.log("这个是添加");
           // 如果添补的列表里有值
-          addExcel(this.file).then(res=>{
+          addExcel(this.file.raw).then(res=>{
             // console.log(res.data)
             if (res.data.errcode === 200) {
               this.$message("上传成功");

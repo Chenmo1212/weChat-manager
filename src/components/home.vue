@@ -78,6 +78,7 @@
 </template>
 
 <script>
+  import {getNewsList, getToken} from '../axios/api';
   export default {
     name: 'HelloWorld',
     data() {
@@ -88,14 +89,15 @@
         screenWidth: null,
         loginStatus: "登录",
         isShowHeader: true,
-        hasLogin: false
+        hasLogin: false,
+        newsList: [],
       }
     },
     created() {
       console.log(localStorage.getItem('hasLogin'));
       this.hasLogin = !!localStorage.getItem('hasLogin');
 
-      console.log('this.hasLogin',this.hasLogin);
+      console.log('this.hasLogin', this.hasLogin);
       console.log(this.$route.name);
       if (this.$route.name === "login") {
         this.checkedIndex = 0
@@ -127,8 +129,34 @@
         console.log("是否登录", this.hasLogin)
       },
       // 是否登录
-      isLogin(){
+      isLogin() {
         localStorage.clear();
+      },
+      // 生成指定后缀文件函数
+      downloadFile(data, name) { // data: 要保存的数据; name: 文件后缀名
+        // 创建一个a标签
+        var ele_a = document.createElement("a");
+
+        // 定义生成文件的文件名及后缀名
+        ele_a.download = "data." + name;
+
+        // 隐藏a标签
+        ele_a.style.display = 'none';
+
+        // 生成一个blob二进制数据，内容为json数据
+        var blob = new Blob([JSON.stringify(data)]);
+
+        // 生成一个指向blob的URL地址，并赋值给a标签的href属性
+        ele_a.href = URL.createObjectURL(blob);
+
+        // Dom文档Body里生成一个a标签
+        document.body.appendChild(ele_a);
+
+        // 模拟点击a标签
+        ele_a.click();
+
+        // 移去a标签
+        document.body.removeChild(ele_a);
       }
     },
     mounted() {
@@ -154,20 +182,20 @@
       }
     },
 
-    watch:{
-      screenWidth(val){
+    watch: {
+      screenWidth(val) {
         // 为了避免频繁触发resize函数导致页面卡顿，使用定时器
-        if(!this.timer){
+        if (!this.timer) {
           // 一旦监听到的screenWidth值改变，就将其重新赋给data里的screenWidth
           this.screenWidth = val
           this.timer = true
           let that = this
-          setTimeout(function(){
+          setTimeout(function () {
             // 打印screenWidth变化的值
             console.log(that.screenWidth);
             location.reload();
             that.timer = false
-          },400)
+          }, 400)
         }
       }
     }

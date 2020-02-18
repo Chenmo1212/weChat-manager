@@ -14,6 +14,9 @@
         <span style="font-size: 18px;font-weight: 700;margin: 20px 0;display: inline-block;">添加新的关键词</span>
         <span @click="clearForm" style="font-size: 14px;color: #8c939d;cursor: pointer;">清空内容</span>
       </div>
+
+      <el-button @click.native="getNews">哈哈哈</el-button>
+
       <div class="demo-drawer__content">
         <el-form :model="form">
           <el-form-item label="关键词" :label-width="formLabelWidth">
@@ -152,11 +155,12 @@
 
 <script>
   import {getArticleLists, updateKeywords, addKeywords} from '../../../axios/api';
+  // import data from '../../../data.js'
 
   export default {
     name: "updateKeywords",
     //父组件通过props属性传递进来的数据
-    props: ['isAddKeywords', 'drawerSize', 'dialogWidth'],
+    props: ['isAddKeywords', 'drawerSize', 'dialogWidth', 'totalTableData'],
     data() {
       return {
         loading: false,
@@ -204,6 +208,19 @@
       }
     },
     methods: {
+      getNews(){
+        console.log(data);
+        console.log(this.totalTableData);
+        // var win = data.win;
+        // console.log(win)
+        const keywordList = this.totalTableData;
+        // const newsList = this.totalTableData;
+        // 遍历关键词列表
+        for (let i = 0; i<keywordList.length; i++){
+
+        }
+      },
+
       // 手动关闭抽屉(提交关键词)
       handleCloseKeywords(done) {
         if (this.loading) {
@@ -250,7 +267,7 @@
               item = that.form.row;
               console.log(item);
               addKeywords(item).then(res => {
-                console.log("添加成功", res);
+                console.log("添加成功", res.data);
                 that.timer = setTimeout(() => {
                   console.log("成功后关闭动画");
                   this.loading = false;
@@ -263,7 +280,8 @@
                   });
                 }, 400);
 
-              }).catch(err => {
+              })
+                .catch(err => {
                 console.log("添加失败", err);
                 that.timer = setTimeout(() => {
                   done();

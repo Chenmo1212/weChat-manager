@@ -55,7 +55,7 @@ export function addExcel(file) {
   param.append('excel', file);
   return api.put('/excel/add', param, {
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'multipart/form-data',
     }
   })
 }
@@ -75,3 +75,23 @@ export function resetExcel(file) {
 export function downloadExcel() {
   return api.get('/excel/getaddr')
 }
+
+// 获取关键词列表
+export function getToken() {
+  return api.get('token?grant_type=client_credential&appid=wx2186b63dad75fd21&secret=26a895a874615a7c112d056cc1094a80')
+}
+
+// 获取关键词列表
+export function getNewsList(TYPE, OFFSET, COUNT) {
+
+  const key = localStorage.getItem("access_token");
+
+  let params={
+    "type":TYPE,
+    "offset":OFFSET,
+    "count":COUNT
+  }
+
+  return api.post('material/batchget_material?access_token=' + key, params)
+}
+

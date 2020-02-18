@@ -90,7 +90,7 @@
     </el-container>
 
     <!--添加关键词-->
-    <update-keywords :isAddKeywords="isAddKeywords" :drawerSize='drawerSize' :dialogWidth='dialogWidth' ref="updateData"  @closeDrawer="updateKeyword"></update-keywords>
+    <update-keywords :totalTableData="totalTableData" :isAddKeywords="isAddKeywords" :drawerSize='drawerSize' :dialogWidth='dialogWidth' ref="updateData"  @closeDrawer="updateKeyword"></update-keywords>
 
     <!--上传下载-->
     <upload-file :isUploadFile="isUploadFile" :drawerSize='drawerSize' @closeUploadDrawer="uploadFile"></upload-file>
@@ -342,14 +342,69 @@
         getKeywordLists().then(res => {
           // console.log(res.data);
           // console.log(res.data.arr);
-          // console.log(JSON.parse(res.data.arr));
-          that.totalTableData = JSON.parse(res.data.arr);
+          console.log(JSON.parse(res.data.arr));
+          that.totalTableData = this.cleanData(JSON.parse(res.data.arr));
           that.screenTableData = that.totalTableData;
           that.loading = false;
+          console.log("关键词列表获取成功")
         }).catch(err => {
           console.log(err)
         })
-      }
+      },
+
+      // 去掉关键词空白的
+      cleanData(arr){
+        // 新建一个临时数组
+        var  tempArr = [];
+        // 定义一个数
+        var count = 0;
+
+        for(let i=0; i<arr.length; i++){
+          if(arr[i].keywords === "" && arr[i].content === "" || arr[i].keywords === null){
+            console.log("收集到一个空的");
+            count++;
+          } else {
+            tempArr.push(arr[i]);
+          }
+        }
+        console.log("有", count, "组是空的, 一共有", arr.length, "组", tempArr);
+
+        console.log("去重开始");
+        tempArr = this.quchong(tempArr);
+        console.log("去重结束");
+
+        return tempArr;
+      },
+      // 数组对象去重
+      quchong(arr) {
+        // console.log(arr);
+
+        if (arr[0].constructor === Object) {
+          // console.log("对象");
+          // 遍历数组
+          let k = 0;
+          for (let i = 0; i < arr.length - 1; i++) {
+            let j = i + 1;
+            while (j < arr.length) {
+              // console.log("j的时间：",arr[j].update_time);
+              // 如果相邻两篇推送的标题相同
+              if (arr[i].keywords.replace(/\s+/g, "") === arr[j].keywords.replace(/\s+/g, "") || arr[i].content.replace(/\s+/g, "") === arr[j].content.replace(/\s+/g, "")) {
+                // console.log("标题相同");
+                // 判断时间先后，取时间后的
+                if (arr[i].news.update_time >= arr[j].news.update_time) {
+                  arr.splice(j, 1);
+                  k++;
+                  continue;
+                }
+              }
+              j++;
+            }
+          }
+          console.log("找到重复值", k, "个");
+          // console.log(arr);
+          return arr;
+        }
+      },
     },
     components: {
       updateKeywords: updateVue,
