@@ -412,21 +412,21 @@
     },
     created() {
 
-      // 判断是否已经登录
-      if (localStorage.getItem('hasLogin')){
-        this.$message({
-          message: '您已登录~',
-          type: 'success'
-        });
-      } else if (this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin) {
-        this.$message("您尚未登录，请先登录后使用");
-        this.$router.push({
-          name: 'login', params: {
-            checkedIndex: 0
-          }
-        });
-        return;
-      }
+      // // 判断是否已经登录
+      // if (localStorage.getItem('hasLogin')){
+      //   this.$message({
+      //     message: '您已登录~',
+      //     type: 'success'
+      //   });
+      // } else if (this.$route.params.hasLogin === undefined || !this.$route.params.hasLogin) {
+      //   this.$message("您尚未登录，请先登录后使用");
+      //   this.$router.push({
+      //     name: 'login', params: {
+      //       checkedIndex: 0
+      //     }
+      //   });
+      //   return;
+      // }
 
       this.getKeywordLists();
 

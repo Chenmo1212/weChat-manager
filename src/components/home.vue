@@ -94,11 +94,11 @@
       }
     },
     created() {
-      console.log(localStorage.getItem('hasLogin'));
+      // console.log(localStorage.getItem('hasLogin'));
       this.hasLogin = !!localStorage.getItem('hasLogin');
 
-      console.log('this.hasLogin', this.hasLogin);
-      console.log(this.$route.name);
+      // console.log('this.hasLogin', this.hasLogin);
+      // console.log(this.$route.name);
       if (this.$route.name === "login") {
         this.checkedIndex = 0
       } else if (this.$route.name === "management") {
@@ -108,19 +108,25 @@
     methods: {
       checkMenu(index) {
         this.checkedIndex = index;
-        console.log(this.checkedIndex);
+        // console.log(this.checkedIndex);
         if (index === 1) {
-          this.$router.push({
-            name: "management",
-            params: {
-              hasLogin: true
-            }
-          });
+          if(localStorage.getItem("hasLogin")) {
+            this.$router.push({
+              name: "management",
+              params: {
+                hasLogin: true
+              }
+            });
+            this.loginStatus = "注销"
+          } else {
+            this.$message("请先登录");
+            this.checkedIndex = 0;
+          }
         }
         if (index === 0) this.$router.push({name: "login"})
       },
       getRouterName(obj) {
-        console.log(obj);
+        // console.log(obj);
         if (obj.routeName === "management") {
           this.checkedIndex = 1
         }
@@ -160,16 +166,16 @@
       }
     },
     mounted() {
-      const that = this;
-      window.onresize = () => {
-        return (() => {
-          window.screenWidth = document.body.clientWidth
-          that.screenWidth = window.screenWidth
-        })()
-      }
+      // const that = this;
+      // window.onresize = () => {
+      //   return (() => {
+      //     window.screenWidth = document.body.clientWidth
+      //     that.screenWidth = window.screenWidth
+      //   })()
+      // }
 
       let screenWidth = document.body.offsetWidth;
-      console.log(screenWidth);
+      // console.log(screenWidth);
       if (screenWidth <= 415) { // phone
         this.isShowHeader = false
       }
@@ -182,23 +188,23 @@
       }
     },
 
-    watch: {
-      screenWidth(val) {
-        // 为了避免频繁触发resize函数导致页面卡顿，使用定时器
-        if (!this.timer) {
-          // 一旦监听到的screenWidth值改变，就将其重新赋给data里的screenWidth
-          this.screenWidth = val
-          this.timer = true
-          let that = this
-          setTimeout(function () {
-            // 打印screenWidth变化的值
-            console.log(that.screenWidth);
-            location.reload();
-            that.timer = false
-          }, 400)
-        }
-      }
-    }
+    // watch: {
+    //   screenWidth(val) {
+    //     // 为了避免频繁触发resize函数导致页面卡顿，使用定时器
+    //     if (!this.timer) {
+    //       // 一旦监听到的screenWidth值改变，就将其重新赋给data里的screenWidth
+    //       this.screenWidth = val
+    //       this.timer = true
+    //       let that = this
+    //       setTimeout(function () {
+    //         // 打印screenWidth变化的值
+    //         console.log(that.screenWidth);
+    //         location.reload();
+    //         that.timer = false
+    //       }, 400)
+    //     }
+    //   }
+    // }
   }
 </script>
 

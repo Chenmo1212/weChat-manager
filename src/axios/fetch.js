@@ -1,14 +1,13 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  // baseURL: window.location.origin + '/wxapi/',
-  // baseURL: 'https://api.weixin.qq.com/cgi-bin/',
-  baseURL: "https://chenmo1212.site" + '/wxapi/',
+  baseURL: window.location.origin + '/wxapi/',
+  // baseURL: "https://chenmo1212.site" + '/wxapi/',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Accept': 'application/json'
   },
-  timeout: 10 * 1000
+  timeout: 15 * 1000
 })
 
 // //设置拦截器

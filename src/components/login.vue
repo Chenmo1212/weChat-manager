@@ -168,7 +168,7 @@
     },
     mounted() {
       let screenWidth = document.body.offsetWidth;
-      console.log(screenWidth);
+      // console.log(screenWidth);
       if (screenWidth < 1920 && screenWidth >= 1200) {
         this.loginSpan = 8;
         this.lineSpan = 0;
@@ -194,8 +194,8 @@
         this.picSpan = 0;
         this.phoneSpan = 24;
       }
-      console.log(this.loginSpan);
-      console.log(this.picSpan)
+      // console.log(this.loginSpan);
+      // console.log(this.picSpan)
     }
   }
 </script>

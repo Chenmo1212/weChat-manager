@@ -14,9 +14,6 @@
         <span style="font-size: 18px;font-weight: 700;margin: 20px 0;display: inline-block;">添加新的关键词</span>
         <span @click="clearForm" style="font-size: 14px;color: #8c939d;cursor: pointer;">清空内容</span>
       </div>
-
-      <el-button @click.native="getNews">哈哈哈</el-button>
-
       <div class="demo-drawer__content">
         <el-form :model="form">
           <el-form-item label="关键词" :label-width="formLabelWidth">
